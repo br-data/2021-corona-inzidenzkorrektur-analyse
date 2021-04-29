@@ -1,0 +1,198 @@
+---
+title: "Analyse"
+date: "`r format(Sys.time(), format='%d. %B %Y, %H:%M Uhr')`"
+author: "Steffen Kühne, Niels Ringler, Oliver Schnuck - BR Data" 
+description: "Dieses R-Template ermöglicht es, Datenanalysen zu veröffentlichen"
+keywords: ["R-Template, Analyse, Datenjournalismus, BR, BR Data, Bayerischer Rundfunk"]
+output:
+  html_document:
+    template: ./lib/template/template.html
+    theme: null
+    mathjax: null
+    pandoc_args: 
+      - --to=html5
+    self_contained: true
+    section_divs: no
+    toc: true
+    css: "./lib/template/style/style.css"
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo=F,
+                      message=F,
+                      warning=F,
+                      attr.source=".code .infobox")
+
+if (!require("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+
+# Load colors, ggplot2 config...
+source("./lib/template/style/style.R")
+
+```
+
+## Über die Daten
+
+Hier beginnt die Analyse. 
+
+## Farbschema
+
+Die ersten fünf Farben kommen aus dem BR24 Farbschema. Weitere Farben entstehen durch Abdunkeln dieser fünf Farbwerte. Anpasungen können in `./lib/template/style/style.R` vorgenommen werden.
+
+```{r}
+USArrests %>%
+  rownames_to_column("State") %>% 
+  filter(row_number() < 16) %>% 
+  ggplot(aes(x = reorder(State, -UrbanPop), y = UrbanPop, fill = reorder(State, -UrbanPop))) +
+  geom_col() +
+  scale_y_continuous(labels = function(x) paste0(x, " %")) + 
+  labs(title = "Anteil der Stadtbevölkerung in 15 Staaten der USA", x = "", y = "", caption = "Quelle: Beispieldatensatz 'USArrests' von R") +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90))
+  
+```
+
+## Tabellen
+
+Für statische Tabellen gibt es beispielsweise die Funktion `kableExtra::kable()`
+
+```{r}
+head(mtcars) %>% 
+  rownames_to_column("name") %>% 
+  kableExtra::kable()
+```
+
+Für interaktive Tabellen gibt es Libraries wie *DT*:  
+Hier sind die Spalten sortierbar und die Daten können direkt zum Download freigegeben werden.  
+
+```{r}
+mtcars %>% 
+  rownames_to_column("name") %>% 
+  DT::datatable(extensions = "Buttons",
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 6,
+                  autoWidth = T))
+```
+
+Tabellen in DT erhalten die Klasse `.dataTable`.  
+In `./lib/template/style/style.css` gibt es dazu einige Anpassungen an den Template-Style.
+
+## Layout
+
+Die gerenderte Analyse liegt im HTML in einem `<div class="block">` in einer `<section>`. Um diese zu verlassen, müssen entsprechende Tags direkt im Markdown geschlossen werden.  
+  
+Folgende Grafik liegt noch in der `<section>`, aber außerhalb des `<div class="block">`:  
+
+</div>
+
+```{r, fig.width=10}
+iris %>% 
+  ggplot(aes(x = Petal.Length, y = Sepal.Length, color = Species)) +
+  geom_point() +
+  labs(title = "Zusammenhang der Länge von Kelch- und Blütenblättern bei Schwertlilien",
+       x = "\nLänge der Blütenblätter",
+       y = "\nLänge der Kelchblätter",
+       caption = "Quelle: Beispieldatensatz 'iris' von R") + 
+  facet_wrap(~Species) +
+  theme(legend.position = "none")
+```
+
+<div class="block">
+
+**Hochskalieren eines Plots hat negative Effekte auf die Auflösung und die Schriftgröße. Diese Effekte kann man mit `fig.width` in der Kopfzeile des Codeblocks ausgleichen.**
+
+Da das Template die Analyse mit abschließenden `</div>` und `</section>` beendet, ist es sinnvoll die Tags nochmal zu öffnen, nachdem man sie manuell geschlossen hat.
+
+<div class="infobox">
+Beliebige andere HTML-Elemente können direkt ins Markdown geschrieben werden.  
+Dies ist beispielsweise eine *Infobox*, bekannt aus dem [Webpack Longread Template](https://web.br.de/interaktiv/longread-webpack/).
+</div>
+
+## Code
+
+Codeblöcke sind per Default nicht sichtbar. Um Code sichtbar zu machen, muss man den Parameter `echo=T` in der Kopfzeile des Codeblocks setzen:
+
+```{r, echo=T}
+WorldPhones %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Jahr") %>% 
+  gather("region", "n", -Jahr) %>%
+  mutate(region = reorder(region, -n)) %>% 
+  ggplot(aes(x = Jahr, y = n, color = region, group = region)) +
+  geom_line() +
+  geom_point() +
+  scale_y_log10() + 
+  labs(title = "Anzahl der Telefone in verschiedenen Regionen\n", x = "\nJahr", y = "\n Telefone in Tsd. (log)", caption = "Quelle: Beispieldatensatz 'WorldPhones' von R") + 
+  theme(legend.position = "right",
+        legend.key = element_rect(fill = "white"),
+        legend.title = element_blank())
+```
+
+## Weitere Hilfsmittel
+
+### Listen
+
+Mit `result='asis` in der Kopfzeile eines Codeblocks lassen sich Spalten aus einem Datensatz als Liste rendern. Hier sind fünf von `r length(unique(rownames(mtcars)))` Autos aus dem Beispieldatensatz *mtcars*:
+
+```{r, results='asis'}
+carnames <- mtcars %>%
+  rownames() %>% 
+  sample(5)
+
+cat(paste0("- ", carnames, "\n"))
+```
+
+**Leerzeile zwischen Text und Codeblock beachten!**
+
+### Small Multiple Alternative
+
+Genauso ist es mit `result='asis` möglich mehrere Spalten einer Tabelle einfach in Diagramme umzusetzen.  
+  
+Hier sind die Top 5 höchsten Werte in den Kategorien *Meilen pro Gallone, Hubraum, Pferdestärke und Gewicht* der Autos aus dem Beispieldatensatz *mtcars*: 
+
+```{r, echo=T, eval=F}
+for(i in c(1, 3, 4, 6)) {
+	cat("<div style=\"width: 24%; display: inline-block;\">")
+  print(data.frame(name = rownames(mtcars), val = mtcars[,i]) %>% 
+  	top_n(5, val) %>% 
+    ggplot(aes(x = reorder(name, val), y = val, fill = reorder(name, -val))) +
+    geom_col() +
+    labs(title = colnames(mtcars)[i], x = "", y = "") + 
+    geom_text(aes(label = val), size = 3, position = position_stack(vjust = 0.5)) +
+    coord_flip() + 
+  	theme(legend.position = "none"))
+  cat("\n")
+  cat("</div>")
+}
+```
+
+</div>
+</section>
+
+```{r, results='asis', fig.width=4, fig.height=3}
+
+for(i in c(1, 3, 4, 6)) {
+	cat("<div style=\"width: 24%; display: inline-block;\">")
+  print(data.frame(name = rownames(mtcars), val = mtcars[,i]) %>% 
+  	top_n(5, val) %>% 
+    ggplot(aes(x = reorder(name, val), y = val, fill = reorder(name, -val))) +
+    geom_col() +
+    labs(title = colnames(mtcars)[i], x = "", y = "") + 
+    geom_text(aes(label = val), size = 3, position = position_stack(vjust = 0.5)) +
+    coord_flip() + 
+  	theme(legend.position = "none"))
+  cat("\n")
+  cat("</div>")
+}
+
+```
+  
+<section>
+<div class="block">
+
+**Liegt ein Diagramm außerhalb einer `<section>`, so liegt auch der entsprechende Codeblock außerhalb. Um das zu vermeiden, muss der Codeblock (leider) redundant an geeigneter Stelle innerhalb einer `<section>` eingefügt werden. Der Code lässt sich mit den Parametern `echo=T, eval=F` anzeigen ohne dabei ausgeführt zu werden.**

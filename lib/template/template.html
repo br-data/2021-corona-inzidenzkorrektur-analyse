@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="./lib/template/assets/images/favicon.ico" />
+  <link
+    rel="shortcut icon"
+    type="image/x-icon"
+    href="./lib/template/assets/images/favicon.ico"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="96x96"
+    href="./lib/template/assets/images/favicon-96x96.png"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="32x32"
+    href="./lib/template/assets/images/favicon-32x32.png"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="16x16"
+    href="./lib/template/assets/images/favicon-16x16.png"
+  />
+  <!-- General SEO -->
+$for(author)$
+  <meta name="author" content="$author$" />
+$endfor$
+$if(title)$
+  <meta name="title" content="$title$" />
+$endif$
+$if(description)$
+  <meta name="description" content="$description$" />
+$endif$
+$if(keywords)$
+  <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+$endif$
+  <title>$if(title)$ $title$ $endif$</title>
+    <style>
+      $styles.html()$
+    </style>
+$for(css)$
+<link rel="stylesheet" href="$css$" />
+$endfor$
+$if(math)$ $math$ $endif$
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+$for(header-includes)$ $header-includes$ $endfor$
+</head>
+<body>
+<main>
+<article>
+$for(include-before)$ $include-before$ $endfor$
+<header id="header">
+<section>
+<div class="block">
+$if(title)$
+<h1 class="title">$title$</h1>
+$endif$
+$if(description)$
+<h2 class="subtitle">
+<strong>$description$</strong>
+</h2>
+$endif$
+$if(author)$
+<p class="author dark-grey">Von: $author$</p>
+$endif$
+$if(date)$
+<p class="date dark-grey">Stand: $date$</p>
+$endif$
+</div>
+</section>
+</header>
+<section>
+<div class="block">
+$if(toc)$
+<nav id="$idprefix$TOC" role="doc-toc">
+<h2 id="$idprefix$toc-title">Inhalt</h2>
+$table-of-contents$
+</nav>
+$endif$
+$body$
+$for(include-after)$ $include-after$ $endfor$
+</div>
+</section>
+</article>
+</main>
+</body>
+</html>
