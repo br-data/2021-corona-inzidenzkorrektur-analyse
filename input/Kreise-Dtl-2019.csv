@@ -1,0 +1,413 @@
+Name,Rkiname,Type,State,Ags,Lat,Long,Pop
+Flensburg,SK Flensburg,Stadt,Schleswig-Holstein,01001,54.785119,9.4323687,90164
+Kiel,SK Kiel,Stadt,Schleswig-Holstein,01002,54.329759,10.130283,246794
+Lübeck,SK Lübeck,Stadt,Schleswig-Holstein,01003,53.875705,10.723051,216530
+Neumünster,SK Neumünster,Stadt,Schleswig-Holstein,01004,54.088042,9.9835962,80196
+Dithmarschen,LK Dithmarschen,Kreis,Schleswig-Holstein,01051,54.133993,9.1096773,133193
+Herzogtum Lauenburg,LK Herzogtum Lauenburg,Kreis,Schleswig-Holstein,01053,53.596434,10.608184,198019
+Nordfriesland,LK Nordfriesland,Kreis,Schleswig-Holstein,01054,54.611088,9.0649543,165951
+Ostholstein,LK Ostholstein,Kreis,Schleswig-Holstein,01055,54.211782,10.86662,200539
+Pinneberg,LK Pinneberg,Kreis,Schleswig-Holstein,01056,53.723182,9.7371433,316103
+Plön,LK Plön,Kreis,Schleswig-Holstein,01057,54.245729,10.363199,128686
+Rendsburg-Eckernförde,LK Rendsburg-Eckernförde,Kreis,Schleswig-Holstein,01058,54.29215,9.7793856,274098
+Schleswig-Flensburg,LK Schleswig-Flensburg,Kreis,Schleswig-Holstein,01059,54.616026,9.5509886,201156
+Segeberg,LK Segeberg,Kreis,Schleswig-Holstein,01060,53.926779,10.142052,277175
+Steinburg,LK Steinburg,Kreis,Schleswig-Holstein,01061,53.930387,9.5111518,131013
+Stormarn,LK Stormarn,Kreis,Schleswig-Holstein,01062,53.728387,10.336683,244156
+Hamburg,SK Hamburg,Stadt,Hamburg,02000,53.553616,10.027361,1847253
+Braunschweig,SK Braunschweig,Stadt,Niedersachsen,03101,52.280839,10.526347,249406
+Salzgitter,SK Salzgitter,Stadt,Niedersachsen,03102,52.129678,10.370679,104291
+Wolfsburg,SK Wolfsburg,Stadt,Niedersachsen,03103,52.411138,10.785036,124371
+Gifhorn,LK Gifhorn,Landkreis,Niedersachsen,03151,52.586249,10.607222,176523
+Goslar,LK Goslar,Landkreis,Niedersachsen,03153,51.876084,10.401684,136292
+Helmstedt,LK Helmstedt,Landkreis,Niedersachsen,03154,52.260419,10.894027,91297
+Northeim,LK Northeim,Landkreis,Niedersachsen,03155,51.74463,9.8518887,132285
+Peine,LK Peine,Landkreis,Niedersachsen,03157,52.308055,10.256622,134801
+Wolfenbüttel,LK Wolfenbüttel,Landkreis,Niedersachsen,03158,52.137751,10.648905,119622
+Göttingen,LK Göttingen,Landkreis,Niedersachsen,03159,51.500939,9.9321137,326041
+Region Hannover,Region Hannover,Landkreis,Niedersachsen,03241,52.424603,9.720613,1157115
+Diepholz,LK Diepholz,Landkreis,Niedersachsen,03251,52.730353,8.7019864,217089
+Hameln-Pyrmont,LK Hameln-Pyrmont,Landkreis,Niedersachsen,03252,52.094196,9.3932046,148549
+Hildesheim,LK Hildesheim,Landkreis,Niedersachsen,03254,52.091993,9.9453013,275817
+Holzminden,LK Holzminden,Landkreis,Niedersachsen,03255,51.881129,9.5553908,70458
+Nienburg (Weser),LK Nienburg (Weser),Landkreis,Niedersachsen,03256,52.611395,9.113799,121390
+Schaumburg,LK Schaumburg,Landkreis,Niedersachsen,03257,52.292013,9.2066986,157820
+Celle,LK Celle,Landkreis,Niedersachsen,03351,52.719791,10.10555,179011
+Cuxhaven,LK Cuxhaven,Landkreis,Niedersachsen,03352,53.618225,8.8035629,198038
+Harburg,LK Harburg,Landkreis,Niedersachsen,03353,53.325053,9.9641457,254431
+Lüchow-Dannenberg,LK Lüchow-Dannenberg,Landkreis,Niedersachsen,03354,53.017929,11.129626,48412
+Lüneburg,LK Lüneburg,Landkreis,Niedersachsen,03355,53.240413,10.577257,184139
+Osterholz,LK Osterholz,Landkreis,Niedersachsen,03356,53.255484,8.8106144,113928
+Rotenburg (Wümme),LK Rotenburg (Wümme),Landkreis,Niedersachsen,03357,53.25506,9.3050983,163782
+Heidekreis,LK Heidekreis,Landkreis,Niedersachsen,03358,52.934247,9.7706982,140673
+Stade,LK Stade,Landkreis,Niedersachsen,03359,53.59498,9.4166249,204512
+Uelzen,LK Uelzen,Landkreis,Niedersachsen,03360,52.993539,10.549805,92389
+Verden,LK Verden,Landkreis,Niedersachsen,03361,52.976043,9.173881,137133
+Delmenhorst,SK Delmenhorst,Stadt,Niedersachsen,03401,53.046392,8.6438715,77559
+Emden,SK Emden,Stadt,Niedersachsen,03402,53.350019,7.241668,49913
+Oldenburg (Oldb),SK Oldenburg,Stadt,Niedersachsen,03403,53.144113,8.2360934,169077
+Osnabrück,SK Osnabrück,Stadt,Niedersachsen,03404,52.279483,8.046646,165251
+Wilhelmshaven,SK Wilhelmshaven,Stadt,Niedersachsen,03405,53.566003,8.0892718,76089
+Ammerland,LK Ammerland,Landkreis,Niedersachsen,03451,53.212532,8.0321495,124859
+Aurich,LK Aurich,Landkreis,Niedersachsen,03452,53.481904,7.3903033,189694
+Cloppenburg,LK Cloppenburg,Landkreis,Niedersachsen,03453,52.905073,7.9209102,170682
+Emsland,LK Emsland,Landkreis,Niedersachsen,03454,52.730863,7.4190007,326954
+Friesland,LK Friesland,Landkreis,Niedersachsen,03455,53.39451,8.0467827,98704
+Grafschaft Bentheim,LK Grafschaft Bentheim,Landkreis,Niedersachsen,03456,52.47913,7.0249016,137162
+Leer,LK Leer,Landkreis,Niedersachsen,03457,53.217026,7.5350353,170756
+Oldenburg,LK Oldenburg,Landkreis,Niedersachsen,03458,52.992398,8.408599,130890
+Osnabrück,LK Osnabrück,Landkreis,Niedersachsen,03459,52.505597,7.8413453,358080
+Vechta,LK Vechta,Landkreis,Niedersachsen,03460,52.663086,8.2271335,142814
+Wesermarsch,LK Wesermarsch,Landkreis,Niedersachsen,03461,53.357849,8.3931147,88583
+Wittmund,LK Wittmund,Landkreis,Niedersachsen,03462,53.594498,7.7199505,56926
+Bremen,SK Bremen,Stadt,Bremen,04011,53.11115,8.7890014,567559
+Bremerhaven,SK Bremerhaven,Stadt,Bremen,04012,53.535877,8.5847177,113643
+Düsseldorf,SK Düsseldorf,Stadt,Nordrhein-Westfalen,05111,51.232947,6.8174691,621877
+Duisburg,SK Duisburg,Stadt,Nordrhein-Westfalen,05112,51.439338,6.7426703,498686
+Essen,SK Essen,Stadt,Nordrhein-Westfalen,05113,51.429552,7.0247831,582760
+Krefeld,SK Krefeld,Stadt,Nordrhein-Westfalen,05114,51.344702,6.5885164,227417
+Mönchengladbach,SK Mönchengladbach,Stadt,Nordrhein-Westfalen,05116,51.170067,6.4214464,261034
+Mülheim an der Ruhr,SK Mülheim a.d.Ruhr,Stadt,Nordrhein-Westfalen,05117,51.410975,6.8861611,170632
+Oberhausen,SK Oberhausen,Stadt,Nordrhein-Westfalen,05119,51.509803,6.8562311,210764
+Remscheid,SK Remscheid,Stadt,Nordrhein-Westfalen,05120,51.179955,7.2230811,111338
+Solingen,SK Solingen,Stadt,Nordrhein-Westfalen,05122,51.158614,7.0692269,159245
+Wuppertal,SK Wuppertal,Stadt,Nordrhein-Westfalen,05124,51.247065,7.1677703,355100
+Kleve,LK Kleve,Kreis,Nordrhein-Westfalen,05154,51.654129,6.2676332,312465
+Mettmann,LK Mettmann,Kreis,Nordrhein-Westfalen,05158,51.293695,7.0111103,485570
+Rhein-Kreis Neuss,LK Rhein-Kreis Neuss,Kreis,Nordrhein-Westfalen,05162,51.141915,6.6543443,451730
+Viersen,LK Viersen,Kreis,Nordrhein-Westfalen,05166,51.286061,6.3305124,298863
+Wesel,LK Wesel,Kreis,Nordrhein-Westfalen,05170,51.627207,6.626953,459976
+Bonn,SK Bonn,Stadt,Nordrhein-Westfalen,05314,50.699837,7.1159508,329673
+Köln,SK Köln,Stadt,Nordrhein-Westfalen,05315,50.941508,6.9777146,1087863
+Leverkusen,SK Leverkusen,Stadt,Nordrhein-Westfalen,05316,51.048871,7.0177991,163729
+Städteregion Aachen,StadtRegion Aachen,Kreis,Nordrhein-Westfalen,05334,50.756428,6.1032996,557026
+Düren,LK Düren,Kreis,Nordrhein-Westfalen,05358,50.817006,6.4476606,264638
+Rhein-Erft-Kreis,LK Rhein-Erft-Kreis,Kreis,Nordrhein-Westfalen,05362,50.901271,6.7226709,470615
+Euskirchen,LK Euskirchen,Kreis,Nordrhein-Westfalen,05366,50.529011,6.6453886,193656
+Heinsberg,LK Heinsberg,Kreis,Nordrhein-Westfalen,05370,51.052035,6.1709684,255555
+Oberbergischer Kreis,LK Oberbergischer Kreis,Kreis,Nordrhein-Westfalen,05374,51.010967,7.5172785,272057
+Rheinisch-Bergischer Kreis,LK Rheinisch-Bergischer Kreis,Kreis,Nordrhein-Westfalen,05378,51.019601,7.1958983,283271
+Rhein-Sieg-Kreis,LK Rhein-Sieg-Kreis,Kreis,Nordrhein-Westfalen,05382,50.755877,7.2402531,600764
+Bottrop,SK Bottrop,Stadt,Nordrhein-Westfalen,05512,51.594362,6.9159912,117565
+Gelsenkirchen,SK Gelsenkirchen,Stadt,Nordrhein-Westfalen,05513,51.549491,7.0817139,259645
+Münster,SK Münster,Stadt,Nordrhein-Westfalen,05515,51.952438,7.6264618,315293
+Borken,LK Borken,Kreis,Nordrhein-Westfalen,05554,51.962198,6.9097557,371339
+Coesfeld,LK Coesfeld,Kreis,Nordrhein-Westfalen,05558,51.864443,7.3713157,220586
+Recklinghausen,LK Recklinghausen,Kreis,Nordrhein-Westfalen,05562,51.669264,7.165792,614137
+Steinfurt,LK Steinfurt,Kreis,Nordrhein-Westfalen,05566,52.2116,7.581675,448220
+Warendorf,LK Warendorf,Kreis,Nordrhein-Westfalen,05570,51.86986,7.9598364,277840
+Bielefeld,SK Bielefeld,Stadt,Nordrhein-Westfalen,05711,52.011184,8.543212,334195
+Gütersloh,LK Gütersloh,Kreis,Nordrhein-Westfalen,05754,51.931784,8.3548388,364938
+Herford,LK Herford,Kreis,Nordrhein-Westfalen,05758,52.168789,8.6427584,250578
+Höxter,LK Höxter,Kreis,Nordrhein-Westfalen,05762,51.685478,9.1884029,140251
+Lippe,LK Lippe,Kreis,Nordrhein-Westfalen,05766,51.981325,8.9548684,347514
+Minden-Lübbecke,LK Minden-Lübbecke,Kreis,Nordrhein-Westfalen,05770,52.352474,8.740944,310409
+Paderborn,LK Paderborn,Kreis,Nordrhein-Westfalen,05774,51.662547,8.7303579,307839
+Bochum,SK Bochum,Stadt,Nordrhein-Westfalen,05911,51.465371,7.2285467,365587
+Dortmund,SK Dortmund,Stadt,Nordrhein-Westfalen,05913,51.512061,7.4796919,588250
+Hagen,SK Hagen,Stadt,Nordrhein-Westfalen,05914,51.347057,7.4970114,188686
+Hamm,SK Hamm,Stadt,Nordrhein-Westfalen,05915,51.66249,7.8263982,179916
+Herne,SK Herne,Stadt,Nordrhein-Westfalen,05916,51.533785,7.2159088,156449
+Ennepe-Ruhr-Kreis,LK Ennepe-Ruhr-Kreis,Kreis,Nordrhein-Westfalen,05954,51.34186,7.3263007,324106
+Hochsauerlandkreis,LK Hochsauerlandkreis,Kreis,Nordrhein-Westfalen,05958,51.305556,8.3972543,259777
+Märkischer Kreis,LK Märkischer Kreis,Kreis,Nordrhein-Westfalen,05962,51.260696,7.7139345,410222
+Olpe,LK Olpe,Kreis,Nordrhein-Westfalen,05966,51.087234,7.9812283,133955
+Siegen-Wittgenstein,LK Siegen-Wittgenstein,Kreis,Nordrhein-Westfalen,05970,50.937992,8.2058809,276944
+Soest,LK Soest,Kreis,Nordrhein-Westfalen,05974,51.5647,8.2236358,301785
+Unna,LK Unna,Kreis,Nordrhein-Westfalen,05978,51.575208,7.6417082,394891
+Darmstadt,SK Darmstadt,Stadt,Hessen,06411,49.882743,8.6752367,159878
+Frankfurt am Main,SK Frankfurt am Main,Stadt,Hessen,06412,50.116773,8.6598981,763380
+Offenbach am Main,SK Offenbach,Stadt,Hessen,06413,50.089561,8.7984841,130280
+Wiesbaden,SK Wiesbaden,Stadt,Hessen,06414,50.076486,8.2738994,278474
+Bergstraße,LK Bergstraße,Landkreis,Hessen,06431,49.669855,8.6318551,270340
+Darmstadt-Dieburg,LK Darmstadt-Dieburg,Landkreis,Hessen,06432,49.855994,8.8061081,297844
+Groß-Gerau,LK Groß-Gerau,Landkreis,Hessen,06433,49.902901,8.4812779,275726
+Hochtaunuskreis,LK Hochtaunuskreis,Landkreis,Hessen,06434,50.27895,8.5206755,236914
+Main-Kinzig-Kreis,LK Main-Kinzig-Kreis,Landkreis,Hessen,06435,50.243344,9.2931037,420552
+Main-Taunus-Kreis,LK Main-Taunus-Kreis,Landkreis,Hessen,06436,50.097876,8.4478967,238558
+Odenwaldkreis,LK Odenwaldkreis,Landkreis,Hessen,06437,49.675058,8.988983,96703
+Offenbach,LK Offenbach,Landkreis,Hessen,06438,50.022103,8.8260025,355813
+Rheingau-Taunus-Kreis,LK Rheingau-Taunus-Kreis,Landkreis,Hessen,06439,50.139484,8.0949772,187160
+Wetteraukreis,LK Wetteraukreis,Landkreis,Hessen,06440,50.352779,8.9212263,308339
+Gießen,LK Gießen,Landkreis,Hessen,06531,50.566243,8.8206054,270688
+Lahn-Dill-Kreis,LK Lahn-Dill-Kreis,Landkreis,Hessen,06532,50.648039,8.3791535,253319
+Limburg-Weilburg,LK Limburg-Weilburg,Landkreis,Hessen,06533,50.427262,8.2174087,171912
+Marburg-Biedenkopf,LK Marburg-Biedenkopf,Landkreis,Hessen,06534,50.83295,8.7522191,247084
+Vogelsbergkreis,LK Vogelsbergkreis,Landkreis,Hessen,06535,50.638109,9.2796685,105643
+Kassel,SK Kassel,Stadt,Hessen,06611,51.313095,9.4655528,202137
+Fulda,LK Fulda,Landkreis,Hessen,06631,50.564394,9.7600374,223145
+Hersfeld-Rotenburg,LK Hersfeld-Rotenburg,Landkreis,Hessen,06632,50.909447,9.755943,120719
+Kassel,LK Kassel,Landkreis,Hessen,06633,51.482179,9.4568303,236764
+Schwalm-Eder-Kreis,LK Schwalm-Eder-Kreis,Landkreis,Hessen,06634,51.023792,9.3816677,179673
+Waldeck-Frankenberg,LK Waldeck-Frankenberg,Landkreis,Hessen,06635,51.188851,8.9051729,156406
+Werra-Meißner-Kreis,LK Werra-Meißner-Kreis,Landkreis,Hessen,06636,51.192965,9.9315409,100629
+Koblenz,SK Koblenz,Stadt,Rheinland-Pfalz,07111,50.34527,7.5872981,114052
+Ahrweiler,LK Ahrweiler,Landkreis,Rheinland-Pfalz,07131,50.461821,7.0515366,130086
+Altenkirchen (Westerwald),LK Altenkirchen,Landkreis,Rheinland-Pfalz,07132,50.751529,7.7516687,128805
+Bad Kreuznach,LK Bad Kreuznach,Landkreis,Rheinland-Pfalz,07133,49.825742,7.6943427,158345
+Birkenfeld,LK Birkenfeld,Landkreis,Rheinland-Pfalz,07134,49.717299,7.2890031,80951
+Cochem-Zell,LK Cochem-Zell,Landkreis,Rheinland-Pfalz,07135,50.131267,7.1864285,61375
+Mayen-Koblenz,LK Mayen-Koblenz,Landkreis,Rheinland-Pfalz,07137,50.32879,7.3401513,214434
+Neuwied,LK Neuwied,Landkreis,Rheinland-Pfalz,07138,50.555697,7.4755532,182811
+Rhein-Hunsrück-Kreis,LK Rhein-Hunsrück-Kreis,Landkreis,Rheinland-Pfalz,07140,50.045793,7.5144261,103163
+Rhein-Lahn-Kreis,LK Rhein-Lahn-Kreis,Landkreis,Rheinland-Pfalz,07141,50.263929,7.8582581,122297
+Westerwaldkreis,LK Westerwaldkreis,Landkreis,Rheinland-Pfalz,07143,50.551418,7.8785675,201904
+Trier,SK Trier,Stadt,Rheinland-Pfalz,07211,49.763893,6.6508604,111528
+Bernkastel-Wittlich,LK Bernkastel-Wittlich,Landkreis,Rheinland-Pfalz,07231,49.925053,6.9707499,112483
+Eifelkreis Bitburg-Prüm,LK Bitburg-Prüm,Landkreis,Rheinland-Pfalz,07232,50.062123,6.4072307,99058
+Vulkaneifel,LK Vulkaneifel,Landkreis,Rheinland-Pfalz,07233,50.232909,6.7528997,60646
+Trier-Saarburg,LK Trier-Saarburg,Landkreis,Rheinland-Pfalz,07235,49.685867,6.83965,149398
+Frankenthal (Pfalz),SK Frankenthal,Stadt,Rheinland-Pfalz,07311,49.533715,8.3608617,48762
+Kaiserslautern,SK Kaiserslautern,Stadt,Rheinland-Pfalz,07312,49.434653,7.768566,100030
+Landau in der Pfalz,SK Landau i.d.Pfalz,Stadt,Rheinland-Pfalz,07313,49.197801,8.1146145,46881
+Ludwigshafen am Rhein,SK Ludwigshafen,Stadt,Rheinland-Pfalz,07314,49.482783,8.4034095,172253
+Mainz,SK Mainz,Stadt,Rheinland-Pfalz,07315,49.971827,8.2525017,218578
+Neustadt an der Weinstraße,SK Neustadt a.d.Weinstraße,Stadt,Rheinland-Pfalz,07316,49.343502,8.151743,53264
+Pirmasens,SK Pirmasens,Stadt,Rheinland-Pfalz,07317,49.19548,7.5914822,40231
+Speyer,SK Speyer,Stadt,Rheinland-Pfalz,07318,49.33493,8.4349693,50561
+Worms,SK Worms,Stadt,Rheinland-Pfalz,07319,49.649206,8.3292565,83542
+Zweibrücken,SK Zweibrücken,Stadt,Rheinland-Pfalz,07320,49.25695,7.3706429,34193
+Alzey-Worms,LK Alzey-Worms,Landkreis,Rheinland-Pfalz,07331,49.756662,8.163596,129687
+Bad Dürkheim,LK Bad Dürkheim,Landkreis,Rheinland-Pfalz,07332,49.453295,8.1148562,132671
+Donnersbergkreis,LK Donnersbergkreis,Landkreis,Rheinland-Pfalz,07333,49.629734,7.9227696,75325
+Germersheim,LK Germersheim,Landkreis,Rheinland-Pfalz,07334,49.118287,8.2496793,129013
+Kaiserslautern,LK Kaiserslautern,Landkreis,Rheinland-Pfalz,07335,49.419772,7.5305697,105979
+Kusel,LK Kusel,Landkreis,Rheinland-Pfalz,07336,49.551705,7.4827308,70219
+Südliche Weinstraße,LK Südliche Weinstraße,Landkreis,Rheinland-Pfalz,07337,49.118284,8.0029424,110521
+Rhein-Pfalz-Kreis,LK Rhein-Pfalz-Kreis,Landkreis,Rheinland-Pfalz,07338,49.418276,8.3627468,154609
+Mainz-Bingen,LK Mainz-Bingen,Landkreis,Rheinland-Pfalz,07339,49.917976,8.0895077,211417
+Südwestpfalz,LK Südwestpfalz,Landkreis,Rheinland-Pfalz,07340,49.209205,7.6577925,94831
+Stuttgart,SK Stuttgart,Stadtkreis,Baden-Württemberg,08111,48.776237,9.1728399,635911
+Böblingen,LK Böblingen,Landkreis,Baden-Württemberg,08115,48.67877,8.9426598,392807
+Esslingen,LK Esslingen,Landkreis,Baden-Württemberg,08116,48.648305,9.3692627,535024
+Göppingen,LK Göppingen,Landkreis,Baden-Württemberg,08117,48.664115,9.7216924,258145
+Ludwigsburg,LK Ludwigsburg,Landkreis,Baden-Württemberg,08118,48.940047,9.1232145,545423
+Rems-Murr-Kreis,LK Rems-Murr-Kreis,Landkreis,Baden-Württemberg,08119,48.897605,9.5033594,427248
+Heilbronn,SK Heilbronn,Stadtkreis,Baden-Württemberg,08121,49.152943,9.1862714,126592
+Heilbronn,LK Heilbronn,Landkreis,Baden-Württemberg,08125,49.251142,9.3064101,344456
+Hohenlohekreis,LK Hohenlohekreis,Landkreis,Baden-Württemberg,08126,49.267073,9.6237602,112655
+Schwäbisch Hall,LK Schwäbisch Hall,Landkreis,Baden-Württemberg,08127,49.142524,9.9177417,196761
+Main-Tauber-Kreis,LK Main-Tauber-Kreis,Landkreis,Baden-Württemberg,08128,49.558019,9.7317661,132399
+Heidenheim,LK Heidenheim,Landkreis,Baden-Württemberg,08135,48.666696,10.18807,132777
+Ostalbkreis,LK Ostalbkreis,Landkreis,Baden-Württemberg,08136,48.879565,10.099291,314025
+Baden-Baden,SK Baden-Baden,Stadtkreis,Baden-Württemberg,08211,48.748736,8.2360311,55185
+Karlsruhe,SK Karlsruhe,Stadtkreis,Baden-Württemberg,08212,49.015061,8.4138363,312060
+Karlsruhe,LK Karlsruhe,Landkreis,Baden-Württemberg,08215,48.909521,8.4076825,445101
+Rastatt,LK Rastatt,Landkreis,Baden-Württemberg,08216,48.882138,8.2248732,231420
+Heidelberg,SK Heidelberg,Stadtkreis,Baden-Württemberg,08221,49.412503,8.6951968,161485
+Mannheim,SK Mannheim,Stadtkreis,Baden-Württemberg,08222,49.501151,8.5037233,310658
+Neckar-Odenwald-Kreis,LK Neckar-Odenwald-Kreis,Landkreis,Baden-Württemberg,08225,49.46632,9.2861412,143633
+Rhein-Neckar-Kreis,LK Rhein-Neckar-Kreis,Landkreis,Baden-Württemberg,08226,49.30138,8.8351919,548355
+Pforzheim,SK Pforzheim,Stadtkreis,Baden-Württemberg,08231,48.879669,8.7136825,125957
+Calw,LK Calw,Landkreis,Baden-Württemberg,08235,48.678608,8.6359698,159201
+Enzkreis,LK Enzkreis,Landkreis,Baden-Württemberg,08236,48.970536,8.8293892,199556
+Freudenstadt,LK Freudenstadt,Landkreis,Baden-Württemberg,08237,48.47664,8.4627154,118243
+Freiburg im Breisgau,SK Freiburg i.Breisgau,Stadtkreis,Baden-Württemberg,08311,47.995554,7.8181515,231195
+Breisgau-Hochschwarzwald,LK Breisgau-Hochschwarzwald,Landkreis,Baden-Württemberg,08315,47.927627,8.0907884,263601
+Emmendingen,LK Emmendingen,Landkreis,Baden-Württemberg,08316,48.151376,7.9001308,166408
+Ortenaukreis,LK Ortenaukreis,Landkreis,Baden-Württemberg,08317,48.423722,8.0146389,430953
+Rottweil,LK Rottweil,Landkreis,Baden-Württemberg,08325,48.259118,8.5273592,139878
+Schwarzwald-Baar-Kreis,LK Schwarzwald-Baar-Kreis,Landkreis,Baden-Württemberg,08326,48.023167,8.4060389,212506
+Tuttlingen,LK Tuttlingen,Landkreis,Baden-Württemberg,08327,48.015076,8.7866082,140766
+Konstanz,LK Konstanz,Landkreis,Baden-Württemberg,08335,47.803101,8.9125795,286305
+Lörrach,LK Lörrach,Landkreis,Baden-Württemberg,08336,47.708577,7.7690697,228736
+Waldshut,LK Waldshut,Landkreis,Baden-Württemberg,08337,47.700909,8.2182879,171003
+Reutlingen,LK Reutlingen,Landkreis,Baden-Württemberg,08415,48.407201,9.3681294,287034
+Tübingen,LK Tübingen,Landkreis,Baden-Württemberg,08416,48.482492,8.9878408,228678
+Zollernalbkreis,LK Zollernalbkreis,Landkreis,Baden-Württemberg,08417,48.268438,8.9325354,189363
+Ulm,SK Ulm,Stadtkreis,Baden-Württemberg,08421,48.393934,9.9530146,126790
+Alb-Donau-Kreis,LK Alb-Donau-Kreis,Landkreis,Baden-Württemberg,08425,48.294959,9.6984361,197076
+Biberach,LK Biberach,Landkreis,Baden-Württemberg,08426,48.110471,9.7758573,201282
+Bodenseekreis,LK Bodenseekreis,Landkreis,Baden-Württemberg,08435,47.736322,9.4051731,217470
+Ravensburg,LK Ravensburg,Landkreis,Baden-Württemberg,08436,47.827299,9.780134,285424
+Sigmaringen,LK Sigmaringen,Landkreis,Baden-Württemberg,08437,48.042245,9.2369418,130849
+Ingolstadt,SK Ingolstadt,Stadt,Bayern,09161,48.751672,11.402123,137392
+München,SK München,Stadt,Bayern,09162,48.14924,11.550583,1484226
+Rosenheim,SK Rosenheim,Stadt,Bayern,09163,47.843242,12.113999,63551
+Altötting,LK Altötting,Landkreis,Bayern,09171,48.214904,12.710466,111516
+Berchtesgadener Land,LK Berchtesgadener Land,Landkreis,Bayern,09172,47.689,12.887468,105929
+Bad Tölz-Wolfratshausen,LK Bad Tölz-Wolfratshausen,Landkreis,Bayern,09173,47.724822,11.488162,127917
+Dachau,LK Dachau,Landkreis,Bayern,09174,48.330886,11.361832,154899
+Ebersberg,LK Ebersberg,Landkreis,Bayern,09175,48.072971,11.916733,143649
+Eichstätt,LK Eichstätt,Landkreis,Bayern,09176,48.894676,11.377377,132881
+Erding,LK Erding,Landkreis,Bayern,09177,48.298097,12.003207,138182
+Freising,LK Freising,Landkreis,Bayern,09178,48.445509,11.744176,180007
+Fürstenfeldbruck,LK Fürstenfeldbruck,Landkreis,Bayern,09179,48.184625,11.20652,219311
+Garmisch-Partenkirchen,LK Garmisch-Partenkirchen,Landkreis,Bayern,09180,47.556054,11.128266,88424
+Landsberg am Lech,LK Landsberg a.Lech,Landkreis,Bayern,09181,48.024573,10.954265,120302
+Miesbach,LK Miesbach,Landkreis,Bayern,09182,47.74006,11.815808,100010
+Mühldorf a. Inn,LK Mühldorf a.Inn,Landkreis,Bayern,09183,48.241361,12.386674,115872
+München,LK München,Landkreis,Bayern,09184,48.00965,11.655151,350473
+Neuburg-Schrobenhausen,LK Neuburg-Schrobenhausen,Landkreis,Bayern,09185,48.660193,11.202207,97303
+Pfaffenhofen a.d. Ilm,LK Pfaffenhofen a.d.Ilm,Landkreis,Bayern,09186,48.593412,11.526963,128227
+Rosenheim,LK Rosenheim,Landkreis,Bayern,09187,47.946992,12.201827,261330
+Starnberg,LK Starnberg,Landkreis,Bayern,09188,48.002201,11.287519,136667
+Traunstein,LK Traunstein,Landkreis,Bayern,09189,47.89873,12.582843,177319
+Weilheim-Schongau,LK Weilheim-Schongau,Landkreis,Bayern,09190,47.787291,11.053654,135478
+Landshut,SK Landshut,Stadt,Bayern,09261,48.543948,12.160501,73411
+Passau,SK Passau,Stadt,Bayern,09262,48.586691,13.415058,52803
+Straubing,SK Straubing,Stadt,Bayern,09263,48.884215,12.574082,47791
+Deggendorf,LK Deggendorf,Landkreis,Bayern,09271,48.784508,13.005449,119478
+Freyung-Grafenau,LK Freyung-Grafenau,Landkreis,Bayern,09272,48.829498,13.515194,78362
+Kelheim,LK Kelheim,Landkreis,Bayern,09273,48.823577,11.859606,123058
+Landshut,LK Landshut,Landkreis,Bayern,09274,48.660179,12.07862,159895
+Passau,LK Passau,Landkreis,Bayern,09275,48.483276,13.260599,192656
+Regen,LK Regen,Landkreis,Bayern,09276,49.02731,13.102578,77410
+Rottal-Inn,LK Rottal-Inn,Landkreis,Bayern,09277,48.431852,12.871481,121502
+Straubing-Bogen,LK Straubing-Bogen,Landkreis,Bayern,09278,49.006714,12.696094,101120
+Dingolfing-Landau,LK Dingolfing-Landau,Landkreis,Bayern,09279,48.645574,12.614768,96683
+Amberg,SK Amberg,Stadt,Bayern,09361,49.453399,11.849567,42207
+Regensburg,SK Regensburg,Stadt,Bayern,09362,49.013426,12.115815,153094
+Weiden i.d. OPf.,SK Weiden i.d.OPf.,Stadt,Bayern,09363,49.668596,12.160877,42743
+Amberg-Sulzbach,LK Amberg-Sulzbach,Landkreis,Bayern,09371,49.552624,11.731463,103049
+Cham,LK Cham,Landkreis,Bayern,09372,49.24159,12.699762,127998
+Neumarkt i.d. OPf.,LK Neumarkt i.d.OPf.,Landkreis,Bayern,09373,49.215729,11.568611,134573
+Neustadt a.d. Waldnaab,LK Neustadt a.d.Waldnaab,Landkreis,Bayern,09374,49.728007,11.892742,94450
+Regensburg,LK Regensburg,Landkreis,Bayern,09375,49.094466,11.917086,194070
+Schwandorf,LK Schwandorf,Landkreis,Bayern,09376,49.36972,12.254654,147872
+Tirschenreuth,LK Tirschenreuth,Landkreis,Bayern,09377,49.900466,12.204166,72046
+Bamberg,SK Bamberg,Stadt,Bayern,09461,49.884114,10.904317,77373
+Bayreuth,SK Bayreuth,Stadt,Bayern,09462,49.936515,11.58837,74783
+Coburg,SK Coburg,Stadt,Bayern,09463,50.259816,10.964065,41072
+Hof,SK Hof,Stadt,Bayern,09464,50.315974,11.897202,45825
+Bamberg,LK Bamberg,Landkreis,Bayern,09471,49.943897,11.112155,147163
+Bayreuth,LK Bayreuth,Landkreis,Bayern,09472,49.803643,11.487996,103664
+Coburg,LK Coburg,Landkreis,Bayern,09473,50.333655,10.880832,86747
+Forchheim,LK Forchheim,Landkreis,Bayern,09474,49.721287,11.181625,116203
+Hof,LK Hof,Landkreis,Bayern,09475,50.21569,11.789149,94801
+Kronach,LK Kronach,Landkreis,Bayern,09476,50.326531,11.37212,66743
+Kulmbach,LK Kulmbach,Landkreis,Bayern,09477,50.101067,11.484014,71566
+Lichtenfels,LK Lichtenfels,Landkreis,Bayern,09478,50.10915,11.120815,66776
+Wunsiedel i. Fichtelgebirge,LK Wunsiedel i.Fichtelgebirge,Landkreis,Bayern,09479,50.09149,12.041012,72655
+Ansbach,SK Ansbach,Stadt,Bayern,09561,49.289653,10.573355,41798
+Erlangen,SK Erlangen,Stadt,Bayern,09562,49.581177,10.985761,112528
+Fürth,SK Fürth,Stadt,Bayern,09563,49.488147,10.973388,128497
+Nürnberg,SK Nürnberg,Stadt,Bayern,09564,49.435679,11.086215,518370
+Schwabach,SK Schwabach,Stadt,Bayern,09565,49.33246,11.031057,40981
+Ansbach,LK Ansbach,Landkreis,Bayern,09571,49.160088,10.430621,184591
+Erlangen-Höchstadt,LK Erlangen-Höchstadt,Landkreis,Bayern,09572,49.677346,10.848502,137262
+Fürth,LK Fürth,Landkreis,Bayern,09573,49.443756,10.857838,117853
+Nürnberger Land,LK Nürnberger Land,Landkreis,Bayern,09574,49.490782,11.373909,170792
+Neustadt a.d. Aisch-Bad Windsheim,LK Neustadt a.d.Aisch-Bad Windsheim,Landkreis,Bayern,09575,49.566294,10.472122,101014
+Roth,LK Roth,Landkreis,Bayern,09576,49.198729,11.130104,126749
+Weißenburg-Gunzenhausen,LK Weißenburg-Gunzenhausen,Landkreis,Bayern,09577,49.029091,10.903037,94734
+Aschaffenburg,SK Aschaffenburg,Stadt,Bayern,09661,49.965224,9.1598653,71002
+Schweinfurt,SK Schweinfurt,Stadt,Bayern,09662,50.042317,10.223202,53426
+Würzburg,SK Würzburg,Stadt,Bayern,09663,49.780016,9.9449642,127934
+Aschaffenburg,LK Aschaffenburg,Landkreis,Bayern,09671,50.0068,9.2512234,174200
+Bad Kissingen,LK Bad Kissingen,Landkreis,Bayern,09672,50.221197,9.9643468,103235
+Rhön-Grabfeld,LK Rhön-Grabfeld,Landkreis,Bayern,09673,50.369698,10.257982,79635
+Haßberge,LK Haßberge,Landkreis,Bayern,09674,50.058476,10.610977,84384
+Kitzingen,LK Kitzingen,Landkreis,Bayern,09675,49.748753,10.260365,91155
+Miltenberg,LK Miltenberg,Landkreis,Bayern,09676,49.756799,9.2445054,128743
+Main-Spessart,LK Main-Spessart,Landkreis,Bayern,09677,49.991344,9.6680921,126158
+Schweinfurt,LK Schweinfurt,Landkreis,Bayern,09678,49.935132,10.346527,115445
+Würzburg,LK Würzburg,Landkreis,Bayern,09679,49.618894,10.001447,162302
+Augsburg,SK Augsburg,Stadt,Bayern,09761,48.341627,10.892835,296582
+Kaufbeuren,SK Kaufbeuren,Stadt,Bayern,09762,47.884084,10.617797,44398
+Kempten (Allgäu),SK Kempten,Stadt,Bayern,09763,47.739602,10.30596,69151
+Memmingen,SK Memmingen,Stadt,Bayern,09764,47.987559,10.162409,44100
+Aichach-Friedberg,LK Aichach-Friedberg,Landkreis,Bayern,09771,48.426496,11.058273,134655
+Augsburg,LK Augsburg,Landkreis,Bayern,09772,48.396895,10.685283,253468
+Dillingen a.d. Donau,LK Dillingen a.d.Donau,Landkreis,Bayern,09773,48.599273,10.535961,96562
+Günzburg,LK Günzburg,Landkreis,Bayern,09774,48.35839,10.385559,127027
+Neu-Ulm,LK Neu-Ulm,Landkreis,Bayern,09775,48.302863,10.142761,175204
+Lindau (Bodensee),LK Lindau,Landkreis,Bayern,09776,47.607267,9.885544,81981
+Ostallgäu,LK Ostallgäu,Landkreis,Bayern,09777,47.69976,10.63783,141182
+Unterallgäu,LK Unterallgäu,Landkreis,Bayern,09778,48.043666,10.394069,145341
+Donau-Ries,LK Donau-Ries,Landkreis,Bayern,09779,48.805268,10.72336,133783
+Oberallgäu,LK Oberallgäu,Landkreis,Bayern,09780,47.514561,10.255646,156008
+Regionalverband Saarbrücken,LK Stadtverband Saarbrücken,Landkreis,Saarland,10041,49.254221,6.9624581,328714
+Merzig-Wadern,LK Merzig-Wadern,Landkreis,Saarland,10042,49.497743,6.6812872,103243
+Neunkirchen,LK Neunkirchen,Landkreis,Saarland,10043,49.382253,7.1228489,131408
+Saarlouis,LK Saarlouis,Landkreis,Saarland,10044,49.357861,6.7777539,194319
+Saarpfalz-Kreis,LK Saarpfalz-Kreis,Landkreis,Saarland,10045,49.250003,7.2453135,142196
+St. Wendel,LK Sankt Wendel,Landkreis,Saarland,10046,49.527195,7.105983,87007
+Berlin Mitte,SK Berlin Mitte,Stadt,Berlin,11001,52.502759,13.399375,375238
+Berlin Friedrichshain-Kreuzberg,SK Berlin Friedrichshain-Kreuzberg,Stadt,Berlin,11002,52.502759,13.399375,282059
+Berlin Pankow,SK Berlin Pankow,Stadt,Berlin,11003,52.502759,13.399375,398036
+Berlin Charlottenburg-Wilmersdorf,SK Berlin Charlottenburg-Wilmersdorf,Stadt,Berlin,11004,52.502759,13.399375,334401
+Berlin Spandau,SK Berlin Spandau,Stadt,Berlin,11005,52.502759,13.399375,239019
+Berlin Steglitz-Zehlendorf,SK Berlin Steglitz-Zehlendorf,Stadt,Berlin,11006,52.502759,13.399375,302177
+Berlin Tempelhof-Schöneberg,SK Berlin Tempelhof-Schöneberg,Stadt,Berlin,11007,52.502759,13.399375,341772
+Berlin Neukölln,SK Berlin Neukölln,Stadt,Berlin,11008,52.502759,13.399375,321123
+Berlin Treptow-Köpenick,SK Berlin Treptow-Köpenick,Stadt,Berlin,11009,52.502759,13.399375,266488
+Berlin Marzahn-Hellersdorf,SK Berlin Marzahn-Hellersdorf,Stadt,Berlin,11010,52.502759,13.399375,262967
+Berlin Lichtenberg,SK Berlin Lichtenberg,Stadt,Berlin,11011,52.502759,13.399375,286522
+Berlin Reinickendorf,SK Berlin Reinickendorf,Stadt,Berlin,11012,52.502759,13.399375,259689
+Brandenburg an der Havel,SK Brandenburg a.d.Havel,Stadt,Brandenburg,12051,52.393582,12.513434,72184
+Cottbus,SK Cottbus,Stadt,Brandenburg,12052,51.773461,14.379693,99678
+Frankfurt (Oder),SK Frankfurt (Oder),Stadt,Brandenburg,12053,52.326169,14.488103,57751
+Potsdam,SK Potsdam,Stadt,Brandenburg,12054,52.396134,13.05742,180334
+Barnim,LK Barnim,Landkreis,Brandenburg,12060,52.82132,13.711743,185244
+Dahme-Spreewald,LK Dahme-Spreewald,Landkreis,Brandenburg,12061,52.044154,13.829476,170791
+Elbe-Elster,LK Elbe-Elster,Landkreis,Brandenburg,12062,51.613588,13.476273,101827
+Havelland,LK Havelland,Landkreis,Brandenburg,12063,52.616959,12.632832,162996
+Märkisch-Oderland,LK Märkisch-Oderland,Landkreis,Brandenburg,12064,52.606125,14.148876,195751
+Oberhavel,LK Oberhavel,Landkreis,Brandenburg,12065,52.903092,13.210681,212914
+Oberspreewald-Lausitz,LK Oberspreewald-Lausitz,Landkreis,Brandenburg,12066,51.618423,13.959035,109371
+Oder-Spree,LK Oder-Spree,Landkreis,Brandenburg,12067,52.246749,14.218978,178803
+Ostprignitz-Ruppin,LK Ostprignitz-Ruppin,Landkreis,Brandenburg,12068,52.986298,12.642753,98861
+Potsdam-Mittelmark,LK Potsdam-Mittelmark,Landkreis,Brandenburg,12069,52.251067,12.708471,216566
+Prignitz,LK Prignitz,Landkreis,Brandenburg,12070,53.104582,11.968515,76158
+Spree-Neiße,LK Spree-Neiße,Landkreis,Brandenburg,12071,51.622702,14.370469,113720
+Teltow-Fläming,LK Teltow-Fläming,Landkreis,Brandenburg,12072,52.072272,13.287821,169997
+Uckermark,LK Uckermark,Landkreis,Brandenburg,12073,53.204681,13.861258,118947
+Rostock,SK Rostock,Stadt,Mecklenburg-Vorpommern,13003,54.15084,12.150236,209191
+Schwerin,SK Schwerin,Stadt,Mecklenburg-Vorpommern,13004,53.621983,11.419816,95653
+Mecklenburgische Seenplatte,LK Mecklenburgische Seenplatte,Landkreis,Mecklenburg-Vorpommern,13071,53.544128,13.002276,258074
+Rostock,LK Rostock,Landkreis,Mecklenburg-Vorpommern,13072,53.911856,12.22239,215794
+Vorpommern-Rügen,LK Vorpommern-Rügen,Landkreis,Mecklenburg-Vorpommern,13073,54.247992,12.898721,224702
+Nordwestmecklenburg,LK Nordwestmecklenburg,Landkreis,Mecklenburg-Vorpommern,13074,53.820465,11.250093,157322
+Vorpommern-Greifswald,LK Vorpommern-Greifswald,Landkreis,Mecklenburg-Vorpommern,13075,53.769177,13.75855,235623
+Ludwigslust-Parchim,LK Ludwigslust-Parchim,Landkreis,Mecklenburg-Vorpommern,13076,53.450094,11.534177,211779
+Chemnitz,SK Chemnitz,Stadt,Sachsen,14511,50.83261,12.939141,246334
+Erzgebirgskreis,LK Erzgebirgskreis,Landkreis,Sachsen,14521,50.609375,12.945301,334948
+Mittelsachsen,LK Mittelsachsen,Landkreis,Sachsen,14522,50.956407,13.137541,304099
+Vogtlandkreis,LK Vogtlandkreis,Landkreis,Sachsen,14523,50.404913,12.338026,225997
+Zwickau,LK Zwickau,Landkreis,Sachsen,14524,50.72636,12.498494,315002
+Dresden,SK Dresden,Stadt,Sachsen,14612,51.100169,13.799476,556780
+Bautzen,LK Bautzen,Landkreis,Sachsen,14625,51.172049,14.3838,299758
+Görlitz,LK Görlitz,Landkreis,Sachsen,14626,51.13691,14.961263,252725
+Meißen,LK Meißen,Landkreis,Sachsen,14627,51.136632,13.434262,241717
+Sächsische Schweiz-Osterzgebirge,LK Sächsische Schweiz-Osterzgebirge,Landkreis,Sachsen,14628,50.917266,13.871576,245586
+Leipzig,SK Leipzig,Stadt,Sachsen,14713,51.333118,12.376875,593145
+Leipzig,LK Leipzig,Landkreis,Sachsen,14729,51.203509,12.439818,258139
+Nordsachsen,LK Nordsachsen,Landkreis,Sachsen,14730,51.472542,12.779554,197741
+Dessau-Roßlau,SK Dessau-Roßlau,Stadt,Sachsen-Anhalt,15001,51.813909,12.241279,80103
+Halle (Saale),SK Halle,Stadt,Sachsen-Anhalt,15002,51.4803,11.974528,238762
+Magdeburg,SK Magdeburg,Stadt,Sachsen-Anhalt,15003,52.115977,11.648383,237565
+Altmarkkreis Salzwedel,LK Altmarkkreis Salzwedel,Landkreis,Sachsen-Anhalt,15081,52.676729,11.229724,83173
+Anhalt-Bitterfeld,LK Anhalt-Bitterfeld,Landkreis,Sachsen-Anhalt,15082,51.647049,12.299255,158486
+Börde,LK Börde,Landkreis,Sachsen-Anhalt,15083,52.059045,11.284423,170923
+Burgenlandkreis,LK Burgenlandkreis,Landkreis,Sachsen-Anhalt,15084,51.134376,11.83389,178846
+Harz,LK Harz,Landkreis,Sachsen-Anhalt,15085,51.822351,10.95932,213310
+Jerichower Land,LK Jerichower Land,Landkreis,Sachsen-Anhalt,15086,52.287454,12.029403,89589
+Mansfeld-Südharz,LK Mansfeld-Südharz,Landkreis,Sachsen-Anhalt,15087,51.535322,11.354395,134942
+Saalekreis,LK Saalekreis,Landkreis,Sachsen-Anhalt,15088,51.363372,11.798382,183815
+Salzlandkreis,LK Salzlandkreis,Landkreis,Sachsen-Anhalt,15089,51.851445,11.641005,189125
+Stendal,LK Stendal,Landkreis,Sachsen-Anhalt,15090,52.693177,11.845665,111190
+Wittenberg,LK Wittenberg,Landkreis,Sachsen-Anhalt,15091,51.791391,12.791179,124953
+Erfurt,SK Erfurt,Stadt,Thüringen,16051,50.982466,11.020683,213981
+Gera,SK Gera,Stadt,Thüringen,16052,50.90074,12.093004,93125
+Jena,SK Jena,Stadt,Thüringen,16053,50.92588,11.591162,111343
+Suhl,SK Suhl,Stadt,Thüringen,16054,50.608361,10.693465,36789
+Weimar,SK Weimar,Stadt,Thüringen,16055,50.977554,11.31781,65228
+Eisenach,SK Eisenach,Stadt,Thüringen,16056,50.990569,10.296955,42250
+Eichsfeld,LK Eichsfeld,Landkreis,Thüringen,16061,51.38163,10.257459,100006
+Nordhausen,LK Nordhausen,Landkreis,Thüringen,16062,51.501566,10.73279,83416
+Wartburgkreis,LK Wartburgkreis,Landkreis,Thüringen,16063,50.892774,10.217819,118974
+Unstrut-Hainich-Kreis,LK Unstrut-Hainich-Kreis,Landkreis,Thüringen,16064,51.182695,10.555401,102232
+Kyffhäuserkreis,LK Kyffhäuserkreis,Landkreis,Thüringen,16065,51.323188,10.989641,74212
+Schmalkalden-Meiningen,LK Schmalkalden-Meiningen,Landkreis,Thüringen,16066,50.628856,10.407442,124916
+Gotha,LK Gotha,Landkreis,Thüringen,16067,50.907203,10.696255,134908
+Sömmerda,LK Sömmerda,Landkreis,Thüringen,16068,51.156333,11.156919,69427
+Hildburghausen,LK Hildburghausen,Landkreis,Thüringen,16069,50.431086,10.737739,63197
+Ilm-Kreis,LK Ilm-Kreis,Landkreis,Thüringen,16070,50.736692,10.968152,106249
+Weimarer Land,LK Weimarer Land,Landkreis,Thüringen,16071,51.032264,11.507425,82156
+Sonneberg,LK Sonneberg,Landkreis,Thüringen,16072,50.413317,11.133108,57717
+Saalfeld-Rudolstadt,LK Saalfeld-Rudolstadt,Landkreis,Thüringen,16073,50.638271,11.311129,103199
+Saale-Holzland-Kreis,LK Saale-Holzland-Kreis,Landkreis,Thüringen,16074,50.905491,11.735917,82950
+Saale-Orla-Kreis,LK Saale-Orla-Kreis,Landkreis,Thüringen,16075,50.582527,11.713913,80312
+Greiz,LK Greiz,Landkreis,Thüringen,16076,50.753331,12.084158,97398
+Altenburger Land,LK Altenburger Land,Landkreis,Thüringen,16077,50.961288,12.410718,89393
