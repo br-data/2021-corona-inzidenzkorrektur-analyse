@@ -20,3 +20,6 @@ Icon
 analyse.html
 analyse_files/
 .Rproj.user
+
+# temporary folder
+lib/tmp_matrix

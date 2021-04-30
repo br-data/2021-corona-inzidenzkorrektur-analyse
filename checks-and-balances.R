@@ -77,8 +77,10 @@ data_rki <- data_rki %>%
 
 
 
-diff_fallzahlen <- data_rki %>% inner_join(data) %>%
+diff_fallzahlen <- data %>% inner_join(data_rki) %>%
   mutate(diff = count_rki - count_michael)
+
+write_csv(diff_fallzahlen, "output/diff-fallzahlen.csv")
 
 
 ggplot(data = diff_fallzahlen, aes(x = diff)) +
@@ -109,9 +111,11 @@ inz_rki <- inz_rki %>%
 
 
 
-diff_inz <- inz_rki %>% inner_join(inz) %>%
+diff_inz <- inz %>% inner_join(inz_rki) %>%
   mutate(diff = count_rki - count_michael) %>%
   mutate(diff_round = round(diff))
+
+write_csv(diff_inz, "output/diff-inzidenzen.csv")
 
 ggplot(data = diff_inz, aes(x = diff)) +
   geom_histogram(binwidth = 1)
