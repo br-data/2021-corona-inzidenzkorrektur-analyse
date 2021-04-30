@@ -1,0 +1,404 @@
+---
+title: "Analyse_Inz_CK"
+date: "`r format(Sys.time(), format='%d. %B %Y, %H:%M Uhr')`"
+author: "Claudia Kohler" 
+output:
+  html_document:
+    template: ./lib/template/template.html
+    theme: null
+    mathjax: null
+    pandoc_args: 
+      - --to=html5
+    self_contained: true
+    section_divs: no
+    toc: true
+    css: "./lib/template/style/style.css"
+---
+
+```{r setup, include=F}
+
+knitr::opts_chunk$set(echo=F,
+                      message=F,
+                      warning=F,
+                      attr.source=".code .infobox")
+
+if (!require ("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+  
+if (!require ("lubridate")) {
+   install.packages("lubridate")
+   library(lubridate)
+}
+
+if (!require ("dplyr")) {
+   install.packages("dplyr")
+   library(dplyr)
+}
+
+# Load colors, ggplot2 config...
+source("./lib/template/style/style.R")
+
+```
+
+## Über die Analyse
+
+Diese Analyse beschäftigt sich mit den Covid-19-Fallzahl-Daten, die seit Beginn der Corona-Pandemie im Januar 2020 in Deutschland vom Robert-Koch-Institut gesammelt werden. Seit Mai 2020 wird aus diesen Daten die 7-Tage-Inzidenz für Covid-Fälle auf Ebene deutschen Landkreise und kreisfreien Städte berechnet:
+
+7-Tage-Inzidenz = 7-Tage-Fallzahl (nach Meldedatum) / Bevölkerung eines Landkreises * 100.000
+
+Dieser Wert gilt seitdem als Messgröße für regionales Infektionsgeschehen, seit November 2020 steht er als Indikator für die Ergreifung von Maßnahmen gegen die Ausbreitung von covid-19 im deutschen Infektionsschutzgesetz.
+
+Die Fallmeldungen, de täglich beim RKI eingehen, sind, besonders für die jüngsten Tage, häufig zu niedrig - sie können rückblickend durch Nachmeldungen korrigiert werden. Allerdings sind diese korrigierten Zahlen, aus denen sich auch korrigierte Inzidenzwerte errechnen lassen, nicht maßgeblich für die Corona-Regelungen.
+
+Hier soll gezeigt werden, wie groß die Auwirkungen der Meldeverzögerung rückblickend auf die Inzidenzen ist und welche Konsequenzen das für Grenzwerte haben kann.
+
+## Über die Daten
+
+Das RKI ergänzt den Datensatz der Covid-19-Fallmeldungen täglich um die neu gemeldeten Fälle nach Meldedatum. Michael Kreil hat für "ARD Data" diesen Datensatz täglich archiviert, sodass die Fallzahlen und Inzidenzen für einen bestimmten Tag mit den Datenständen verschiedener Tage betrachtet werden können.
+
+Mit dem im Repo gespeicherten Java-Code wird auf dieses Archiv zugegriffen und die 7-Tage-Fallzahlen für jede Kombination aus Übertragungsdatum, Meldedatum und Landkreis seit dem 1. Januar 2021 aggregiert. Die entsprechende csv.-Datei liegt, ebenso wie eine csv mit den Bevölkerungs- und Geodaten der Landkreise im Ordner input.
+
+## Analyse
+
+#### Einlesen
+
+Die beiden vorbereiteten csv-Dateien werden eingelesen.
+
+-> nicht vergessen, eventuell Berlin loswerden
+
+
+```{r}
+
+data <- read.csv("./input/matrix_fallzahlen_7tage.csv", check.names = FALSE)
+kreise <- read.csv("./input/Kreise-Dtl-2019.csv",check.names = FALSE, colClasses = c(Ags = "character"), fileEncoding="UTF-8" )
+
+data$datenstand <- ymd(data$datenstand)
+data$tag_nach_meldezeitraum <- ymd(data$tag_nach_meldezeitraum) 
+
+```
+
+
+#### 7-Tage-Inzidenz berechnen
+
+Maßgeblich für die Analyse ist der Vergleich der Inzidenzwerte der Landkreise -> Berechnung der Werte aus den 7-Tage-Fallzahlen und der Bevölkerungsinformation aus der Kreise-Datei
+
+Formel: 7-Tage-Fallzahl / Einwohnerzahl *100.000
+
+
+```{r}
+ags <- kreise$Ags
+data_inz <- data %>% select(c(datenstand,tag_nach_meldezeitraum)) 
+
+for(i in 1:length(ags)) {
+  
+  col = ags[i]
+  
+  data_new <- data %>% select(c(datenstand,tag_nach_meldezeitraum,col))
+  names(data_new)[3] <- "fallzahl"
+  
+  
+  kreis <- kreise %>% filter(., ags == col)
+  pop <- as.numeric(kreis[,8])
+  
+  data_new <- data_new %>% mutate(., inz = (fallzahl/pop*100000))%>% select(c(datenstand,tag_nach_meldezeitraum,inz))
+  names(data_new)[3] <- col
+  
+  data_inz <- inner_join(data_inz,data_new, by = c("datenstand"="datenstand","tag_nach_meldezeitraum"="tag_nach_meldezeitraum"))
+  
+}
+
+data_inz <- data_inz %>% mutate_if(is.numeric, round)
+
+data_inz %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 6,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+
+```
+
+
+#### Differenzen zum ersten Datenstand nach n Tagen
+
+Um später die Differenzen aggregieren zu können, wird zuerst die Differenz zwischen jedes einzelnen Datenstandes mit dem "ersten Datenstand" für jede Landkreis/Tag-Kombination berechnet.
+
+Die Differenz zwischen dem aktuellsten und dem "ersten" Datenstand wird in ein einzelnes Frame gepackt, um die ursprünglichen Kurvenplots der einzelnen Landkreise generieren zu können
+
+Dann wird ein Frame mit den Deltas nach 1, 3, 5, und 14 Tagen generiert
+
+```{r fig.width=10}
+rki_namen <- kreise %>% select(.,c("Ags","Rkiname") )
+data_long <- data_inz %>% gather("Ags", "Inzidenz", 3:414) %>%
+             mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
+             left_join(., rki_namen, by = "Ags")
+
+
+######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
+
+data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "Datenstand", 
+                                                datenstand == "2021-04-27" ~ "Neu")) %>%
+                        filter(., !is.na(Ind)) %>%
+                        select(., -datenstand) %>%
+                        spread(., Ind, Inzidenz )
+
+
+######### Inzidenzen nach 1/ 3 / 5 /14 Tagen
+
+data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldezeitraum)  ~ "Datenstand",
+                                                  (datenstand-tag_nach_meldezeitraum == 1) ~ "nach_1_Tag",
+                                                  (datenstand-tag_nach_meldezeitraum == 3) ~ "nach_3_Tagen",
+                                                  (datenstand-tag_nach_meldezeitraum == 5) ~ "nach_5_Tagen",
+                                                  (datenstand-tag_nach_meldezeitraum == 14) ~ "nach_14_Tagen")) %>%
+                            filter(., !is.na(Ind)) %>%
+                            select(., -datenstand) %>%
+                            spread(., Ind, Inzidenz ) %>%
+                            mutate(., delta_1 = nach_1_Tag-Datenstand, delta_3 = nach_3_Tagen-Datenstand, 
+                                      delta_5 = nach_5_Tagen-Datenstand,delta_I4=nach_14_Tagen-Datenstand)
+
+data_diff %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 10,
+                  scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+Durchschnitte <- data.frame(Zeitraum = c("nach 1 Tag","nach 3 Tagen", "nach 5 Tagen", "nach 14 Tagen"), durschn_veraenderung = c(mean(abs(data_diff$delta_1), na.rm = TRUE),mean(abs(data_diff$delta_3), na.rm = TRUE),mean(abs(data_diff$delta_5), na.rm = TRUE),mean(abs(data_diff$delta_I4), na.rm = TRUE))) 
+
+Durchschnitte %>% DT::datatable(
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  pageLength = 6,
+                  autoWidth = F))
+
+data_diff_rec <- data_diff %>% filter(.,tag_nach_meldezeitraum >= "2021-03-01")
+
+DS_rec <- data.frame(Zeitraum = c("nach 1 Tag","nach 3 Tagen", "nach 5 Tagen", "nach 14 Tagen"), durschn_veraenderung = c(mean(abs(data_diff_rec$delta_1), na.rm = TRUE),mean(abs(data_diff_rec$delta_3), na.rm = TRUE),mean(abs(data_diff_rec$delta_5), na.rm = TRUE),mean(abs(data_diff_rec$delta_I4), na.rm = TRUE))) 
+
+DS_rec %>% DT::datatable(
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  pageLength = 6,
+                  autoWidth = F))
+
+```
+
+
+#### Differenzen nach n Tagen aggregieren
+
+Fragen: Wie sehen die Veränderungen nach n Tagen im Durchschnitt aus? Im Median? Was sind die größten und kleinsten Veränderungen?
+
+ - nach Landkreisen:
+
+```{r}
+
+data_diff_lk <- data_diff %>% 
+  mutate_at(vars(delta_1,delta_3, delta_5,delta_I4), abs) %>%
+  group_by(Ags,Rkiname) %>%
+  summarise_at(vars(delta_1,delta_3, delta_5,delta_I4), funs(mean, median, max, min), na.rm = TRUE)
+
+data_diff_lk %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 6,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+```
+
+Im Durchschnitt weicht der Inzidenzwert 
+
+- nach Tagen:
+
+```{r}
+data_diff_d <- data_diff %>%
+  mutate_at(vars(delta_1,delta_3, delta_5,delta_I4), abs) %>%
+  group_by(tag_nach_meldezeitraum) %>%
+  summarise_at(vars(delta_1,delta_3, delta_5,delta_I4), funs(mean, median, max, min), na.rm = TRUE)
+
+data_diff_d %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 6,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+```
+
+- nach Wochentagen
+
+```{r}
+data_diff_wd <- data_diff %>%
+  mutate_at(vars(delta_1,delta_3, delta_5,delta_I4), abs) %>%
+  group_by(weekday) %>%
+  summarise_at(vars(delta_1,delta_3, delta_5,delta_I4), funs(mean, median, max, min), na.rm = TRUE)
+
+data_diff_wd %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 7,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+```
+
+### Veränderung der Inzidenzwerte pro Tag 
+
+Frage: Um wieviel ändern sich die Inzidenzwerte pro Tag? Nach wie vielen Tagen bleibt der Inzidenzwert nahezu konstant?
+
+
+```{r}
+
+
+
+
+```
+
+
+### PLOTS
+
+#### Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
+
+```{r}
+
+# Such einen Kreis aus, bsp. Schwabach
+lk = "LK Ansbach"
+lk = rki_namen[230,2]
+
+# So unterscheidet sich die Inzidenz zum Datenstand und die "reale" Inzidenz:
+data_vg %>%
+  filter(Rkiname == lk) %>%
+  ggplot() +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Neu), color="red") +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand), colour="blue") +
+  xlab("Datum") + ylab("Inzidenz") +
+  ggtitle(lk, "rot = nach aktuellem Datenstand, blau = nach hist. Datenstand") 
+
+```
+
+
+#### Verteilung Differenzen nach 1/3/7/14 Tagen ~ Tag
+
+
+````{r}
+
+data_diff %>% 
+  gather("Art", "Delta", 10:13) %>%
+  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
+  geom_point(aes(color=Art)) +
+  facet_grid(Art~.)+
+  theme(legend.position = "none")
+
+````
+
+
+````{r}
+
+data_diff %>% 
+  gather("Art", "Delta", 10:13) %>%
+  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
+  geom_boxplot(aes(fill=Art)) +
+  facet_grid(.~Art)+
+  theme(legend.position = "none")
+
+````
+
+
+#### Verteilung Differenzen nach 1/3/7/14 Tagen ~ LK
+
+
+````{r}
+
+data_diff %>% 
+  gather("Art", "Delta", 10:13) %>%
+  ggplot(aes(x=Ags,y=Delta, group=Art))+
+  geom_point(aes(color=Art)) +
+  facet_grid(Art~.)+
+  theme(legend.position = "none")
+```
+
+
+```{r}
+
+data_diff %>% 
+  gather("Art", "Delta", 10:13) %>%
+  ggplot(aes(x=Ags,y=Delta, group=Art))+
+  geom_boxplot(aes(fill=Art)) +
+  facet_grid(.~Art)+
+  theme(legend.position = "none")
+
+```
+
+
+#### Verteilung Median Differenz nach 1/3/7/14 Tagen ~ Tag
+
+```{r}
+
+data_diff_d %>% 
+  gather("Art", "Delta_Med", 6:9) %>%
+  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
+  geom_point(aes(color=Art)) +
+  geom_smooth()+
+  facet_grid(Art~.)+
+  theme(legend.position = "none")
+```
+
+````{r}
+
+data_diff_d %>% 
+  gather("Art", "Delta_Med", 6:9) %>%
+  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
+  geom_boxplot(aes(fill=Art)) +
+  facet_grid(.~Art)+
+  theme(legend.position = "none")
+````
+
+
+#### Verteilung Median Differenz nach 1/3/7/14 Tagen ~ LK
+
+````{r}
+
+data_diff_lk %>% 
+  gather("Art", "Delta_Med", 7:10) %>%
+  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+  geom_point(aes(color=Art)) +
+  facet_grid(Art~.)+
+  theme(legend.position = "none")
+
+````
+
+````{r}
+
+data_diff_lk %>% 
+  gather("Art", "Delta_Med", 7:10) %>%
+  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+  geom_boxplot(aes(fill=Art)) +
+  facet_grid(.~Art)+
+  theme(legend.position = "none")
+
+````
+
+
+</div>
+</sec>
