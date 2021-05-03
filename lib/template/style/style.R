@@ -14,6 +14,7 @@ br24_colours <- c(br24_colours, colorspace::darken(br24_colours, 0.3), colorspac
 # ggplot2 config
 theme_update(plot.margin = margin(30, 0, -0, 0, "pt"),
              panel.background = element_blank(),
+             panel.grid.major.y = element_line(colour = "grey"),
              # axis.title.x = element_blank(),
              # axis.title.y = element_text(angle = 0, margin = margin(0, 0, 0, 0, "pt"), vjust = 1.15),
              axis.text.x = element_text(angle = 0),

@@ -143,7 +143,7 @@ data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeit
                         spread(., Ind, Inzidenz )
 ```
 
-```{r, echo=T}
+```{r, echo=F}
 
 # Such einen Kreis aus, bsp. Schwabach
 lk = "SK München"
@@ -228,11 +228,19 @@ data_diff <- data_diff %>%
 
 data_diff_bl <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
                 group_by(Bl) %>%
-                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
+                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max), na.rm = TRUE)
 
 data_diff_bl %>% 
   gather("Tage", "Median_Delta", 8:13) %>%
   ggplot(aes(x=Tage,y=Median_Delta, group=Bl))+
+  geom_point() +
+  facet_wrap(.~Bl)+
+  theme(legend.position = "none",
+        panel.grid.major.y = element_line(colour = "black"))
+
+data_diff_bl %>% 
+  gather("Tage", "Quantile_Delta", 14:19) %>%
+  ggplot(aes(x=Tage,y=Quantile_Delta, group=Bl))+
   geom_point() +
   facet_wrap(.~Bl)+
   theme(legend.position = "none")
@@ -285,13 +293,13 @@ data_diff_d %>%
     xlab("Tag nach meldezeitraum") + ylab("Median_Abweichung") +
   theme(legend.position = "none")
 
-data_diff_d %>% 
-  gather("Art", "Delta_Med", 8:13) %>%
-  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
-  geom_boxplot(aes(fill=Art)) +
-  facet_grid(.~Art)+
-   xlab("Tag nach Meldezeitraum") + ylab("Median Abweichung") +
-  theme(legend.position = "none")
+# data_diff_d %>% 
+#   gather("Art", "Delta_Med", 8:13) %>%
+#   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
+#   geom_boxplot(aes(fill=Art)) +
+#   facet_grid(.~Art)+
+#    xlab("Tag nach Meldezeitraum") + ylab("Median Abweichung") +
+#   theme(legend.position = "none")
 
 ```
 
