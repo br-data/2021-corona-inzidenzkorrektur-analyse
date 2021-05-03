@@ -17,7 +17,8 @@ Icon
 .Rhistory
 
 ### Project ###
-analyse.html
+#analyse.html
+*.html
 analyse_files/
 .Rproj.user
 

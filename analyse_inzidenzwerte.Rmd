@@ -73,7 +73,9 @@ Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Zeitraum wird ausgew
 ```{r}
 
 data <- read_csv("./input/matrix_fallzahlen_7tage.csv")
-kreise <- read.csv("./input/Kreise-Dtl-2019.csv",check.names = FALSE, colClasses = c(Ags = "character"), fileEncoding="UTF-8" )
+
+kreise <- read_csv("./input/Kreise-Dtl-2019.csv")
+#kreise <- read.csv("./input/Kreise-Dtl-2019.csv",check.names = FALSE, colClasses = c(Ags = "character"), fileEncoding="UTF-8" )
 
 data <- data %>% filter(datenstand >= "2021-03-01")
 
@@ -163,18 +165,23 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
 
 data_diff_ges <- data_diff %>% mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
                                 summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
-                                             funs(mean, median,max),na.rm = TRUE) %>%
+                                             funs(mean, median, max, quartil=quantile(., probs = 0.75), quantil=quantile(., probs = 0.9)),na.rm = TRUE) %>%
                                 gather("Art","Inz") %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
                                                       (grepl("2",Art)==TRUE)  ~ "nach_2",
                                                       (grepl("3",Art)==TRUE)  ~ "nach_3",
-                                                      (grepl("4",Art,fixed =TRUE)==TRUE )  ~ "nach_4",
+                                                      (grepl("_4",Art,fixed =TRUE)==TRUE )  ~ "nach_4",
                                                       (grepl("5",Art)==TRUE)  ~ "nach_5",
                                                       (grepl("I4",Art,fixed =TRUE)==TRUE)  ~ "nach_I4")) %>%
                                 mutate(groesse = case_when((grepl("mean",Art)==TRUE)  ~ "Mean",
                                                       (grepl("median",Art)==TRUE)  ~ "Median",
-                                                      (grepl("max",Art)==TRUE)  ~ "Max"))%>%
-                                select(-Art)
+                                                      (grepl("max",Art)==TRUE)  ~ "Max",
+                                                      (grepl("quartil",Art)==TRUE)  ~ "Quantil_75",
+                                                      (grepl("quantil",Art)==TRUE)  ~ "Quantil_90"))%>%
+                                mutate(Inz = round(Inz, 1)) %>%
+                                select(-Art) %>%
+                                pivot_wider(names_from = groesse, values_from = Inz) %>%
+                                select(zeitraum, Mean, Median, Quantil_75, Quantil_90, Max)
                       
 
 data_diff_ges %>% DT::datatable(
