@@ -72,7 +72,7 @@ Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Zeitraum wird ausgew
 
 ```{r}
 
-data <- read.csv("./input/matrix_fallzahlen_7tage.csv", check.names = FALSE)
+data <- read_csv("./input/matrix_fallzahlen_7tage.csv")
 kreise <- read.csv("./input/Kreise-Dtl-2019.csv",check.names = FALSE, colClasses = c(Ags = "character"), fileEncoding="UTF-8" )
 
 data <- data %>% filter(datenstand >= "2021-03-01")
@@ -155,7 +155,7 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
                             filter(., !is.na(Ind)) %>%
                             select(., -datenstand) %>%
                             spread(., Ind, Inzidenz ) %>%
-                            mutate(., delta_1 = nach_1-Datenstand, delta_2 = nach_2-Datenstand, 
+                            mutate(., delta_1 = nach_1-Datenstand, delta_2 = nach_2-Datenstand,
                                       delta_3 = nach_3-Datenstand,delta_4 = nach_4-Datenstand,
                                       delta_5 = nach_5-Datenstand,delta_I4=nach_14-Datenstand) %>%
                             filter(tag_nach_meldezeitraum >= "2021-03-01")
