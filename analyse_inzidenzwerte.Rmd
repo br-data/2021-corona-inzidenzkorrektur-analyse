@@ -121,43 +121,13 @@ data_inz <- data_inz %>% mutate_if(is.numeric, round)
 ```
 
 
-#### Differenz: Aktuellster und "erster" Datenstand
-
-Die Differenz zwischen dem aktuellsten und dem "ersten" Datenstand wird in einem gesonderten Frame gespeichert, um beispielhaft das aktuell größte Ausmaß der Abweichungen zeigen zu können:
-
-
-
 ```{r fig.width=10}
 rki_namen <- kreise %>% select(.,c("Ags","Rkiname") )
 data_long <- data_inz %>% gather("Ags", "Inzidenz", 3:414) %>%
              mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
              left_join(., rki_namen, by = "Ags")
-
-
-######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
-
-data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "Datenstand", 
-                                                datenstand == max(datenstand) ~ "Neu")) %>%
-                        filter(., !is.na(Ind)) %>%
-                        select(., -datenstand) %>%
-                        spread(., Ind, Inzidenz )
 ```
 
-```{r, echo=F}
-
-# Such einen Kreis aus, bsp. Schwabach
-lk = "SK München"
-
-# So unterscheidet sich die Inzidenz zum Datenstand und die "reale" Inzidenz:
-data_vg %>%
-  filter(Rkiname == lk) %>%
-  ggplot() +
-  geom_line(aes(x=tag_nach_meldezeitraum,y=Neu), color=br24_colours[4]) +
-  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand), color=br24_colours[1]) +
-  xlab("Datum") + ylab("Inzidenz") +
-  ggtitle(lk, "rot = nach aktuellem Datenstand, blau = nach hist. Datenstand") 
-
-```
 
 
 #### Durchschnittliche Differenz nach n Tagen
@@ -213,6 +183,14 @@ data_diff_ges %>% DT::datatable(
                   pageLength = 6,
                   autoWidth = F))
 
+
+data_diff %>% 
+  gather("Art", "Delta", 13:18) %>%
+  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
+  geom_boxplot(aes(fill=Art)) +
+  facet_grid(.~Art)+
+  theme(legend.position = "none")
+
 ```
 
 
@@ -228,15 +206,21 @@ data_diff <- data_diff %>%
 
 data_diff_bl <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
                 group_by(Bl) %>%
-                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max), na.rm = TRUE)
+                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE)
+
+data_diff_bl %>% 
+  gather("Tage", "Mean_Delta", 2:7) %>%
+  ggplot(aes(x=Tage,y=Mean_Delta, group=Bl))+
+  geom_point() +
+  facet_wrap(.~Bl)+
+  theme(legend.position = "none")
 
 data_diff_bl %>% 
   gather("Tage", "Median_Delta", 8:13) %>%
   ggplot(aes(x=Tage,y=Median_Delta, group=Bl))+
   geom_point() +
   facet_wrap(.~Bl)+
-  theme(legend.position = "none",
-        panel.grid.major.y = element_line(colour = "black"))
+  theme(legend.position = "none")
 
 data_diff_bl %>% 
   gather("Tage", "Quantile_Delta", 14:19) %>%
@@ -265,7 +249,9 @@ data_diff_lk %>%
   geom_point(aes(color=Art)) +
   facet_grid(Art~.)+
   xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
-  theme(legend.position = "none")
+  theme(legend.position = "none") + 
+  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "", "ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) + 
+  theme(panel.grid.major.x = element_line(colour = "grey"))
 
 ```
 
@@ -276,13 +262,6 @@ data_diff_d <- data_diff %>%
   mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
   group_by(tag_nach_meldezeitraum) %>%
   summarise_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
-
-data_diff %>% 
-  gather("Art", "Delta", 13:18) %>%
-  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
-  geom_boxplot(aes(fill=Art)) +
-  facet_grid(.~Art)+
-  theme(legend.position = "none")
 
 data_diff_d %>% 
   gather("Art", "Delta_Med", 8:13) %>%
@@ -309,7 +288,8 @@ data_diff_d %>%
 data_diff_wd <- data_diff %>%
   mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
   group_by(weekday) %>%
-  summarise_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
+  summarise_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max), na.rm = TRUE) %>%
+  mutate(across(2:7, ~round(.x, digits = 1)))
 
 data_diff_wd %>% 
   DT::datatable(extensions = c("Buttons","FixedColumns"),
@@ -321,9 +301,43 @@ data_diff_wd %>%
                   scrollCollapse = TRUE,
                   autoWidth = T))
 
+data_diff_wd %>% 
+  gather("Tage", "delta_agg", c(2, 4, 6, 8, 10, 12, 14, 16, 18)) %>%
+  ggplot(aes(x=weekday,y=delta_agg, group=Tage))+
+  geom_point() +
+  facet_wrap(.~Tage)+
+  theme(legend.position = "none")
+
+
 ```
 
 
+#### Differenz: Aktuellster und "erster" Datenstand
 
-</div>
-</sec>
+Die Differenz zwischen dem aktuellsten und dem "ersten" Datenstand wird in einem gesonderten Frame gespeichert, um beispielhaft das aktuell größte Ausmaß der Abweichungen zeigen zu können:
+
+
+
+```{r, echo=F}
+
+######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
+
+data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "Datenstand", 
+                                                datenstand == max(datenstand) ~ "Neu")) %>%
+                        filter(., !is.na(Ind)) %>%
+                        select(., -datenstand) %>%
+                        spread(., Ind, Inzidenz )
+
+# Such einen Kreis aus, bsp. Schwabach
+lk = "SK München"
+
+# So unterscheidet sich die Inzidenz zum Datenstand und die "reale" Inzidenz:
+data_vg %>%
+  filter(Rkiname == lk) %>%
+  ggplot() +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Neu), color=br24_colours[4]) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand), color=br24_colours[1]) +
+  xlab("Datum") + ylab("Inzidenz") +
+  ggtitle(lk, "rot = nach aktuellem Datenstand, blau = nach hist. Datenstand") 
+
+```
