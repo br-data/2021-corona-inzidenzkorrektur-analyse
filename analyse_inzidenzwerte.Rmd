@@ -200,7 +200,7 @@ Aus unseren vorngehenden Recherchen wissen wir, dass ein Grund von Abweichungen 
 
 ````{r}
 
-data_diff_rel <- data_diff %>%  filter(Datenstand <= 180 %>%
+data_diff_rel <- data_diff %>% filter(Datenstand <= 180) %>%
                                 mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
                                 summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
                                              funs(mean, median, max, quartil=quantile(., probs = 0.75), 
