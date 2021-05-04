@@ -23,4 +23,4 @@ analyse_files/
 .Rproj.user
 
 # temporary folder
-lib/tmp_matrix
+lib/tmp_data
