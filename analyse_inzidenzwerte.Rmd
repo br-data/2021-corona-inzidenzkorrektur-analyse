@@ -75,7 +75,6 @@ Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Zeitraum wird ausgew
 data <- read_csv("./input/matrix_fallzahlen_7tage.csv")
 
 kreise <- read_csv("./input/Kreise-Dtl-2019.csv")
-#kreise <- read.csv("./input/Kreise-Dtl-2019.csv",check.names = FALSE, colClasses = c(Ags = "character"), fileEncoding="UTF-8" )
 
 data <- data %>% filter(datenstand >= "2021-03-01" & tag_nach_meldezeitraum >= "2021-03-01")
 
@@ -123,7 +122,7 @@ data_inz <- data_inz %>% mutate_if(is.numeric, round)
 
 ```{r fig.width=10}
 rki_namen <- kreise %>% select(.,c("Ags","Rkiname") )
-data_long <- data_inz %>% gather("Ags", "Inzidenz", 3:414) %>%
+data_long <- data_inz %>% pivot_longer(names_to = "Ags", values_to = "Inzidenz", 3:414) %>%
              mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
              left_join(., rki_namen, by = "Ags")
 ```
@@ -149,7 +148,7 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
                                                   (datenstand-tag_nach_meldezeitraum == 14) ~ "nach_14")) %>%
                             filter(., !is.na(Ind)) %>%
                             select(., -datenstand) %>%
-                            spread(., Ind, Inzidenz ) %>%
+                            pivot_wider(names_from = Ind, values_from= Inzidenz ) %>%
                             mutate(., delta_1 = nach_1-Datenstand, delta_2 = nach_2-Datenstand,
                                       delta_3 = nach_3-Datenstand,delta_4 = nach_4-Datenstand,
                                       delta_5 = nach_5-Datenstand,delta_I4=nach_14-Datenstand) 
@@ -157,8 +156,8 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
 data_diff_ges <- data_diff %>% mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
                                 summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
                                              funs(mean, median, max, quartil=quantile(., probs = 0.75), 
-                                                  quantil=quantile(., probs = 0.9)),na.rm = TRUE) %>%
-                                gather("Art","Inz") %>%
+                                                  quantil=quantile(., probs = 0.9)),na.rm = TRUE)%>%
+                                pivot_longer(names_to = "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
                                                       (grepl("2",Art)==TRUE)  ~ "nach_2",
                                                       (grepl("3",Art)==TRUE)  ~ "nach_3",
@@ -172,9 +171,8 @@ data_diff_ges <- data_diff %>% mutate_at(vars(delta_1, delta_2,delta_3,delta_4,d
                                                       (grepl("quantil",Art)==TRUE)  ~ "Quantil_90"))%>%
                                 mutate(Inz = round(Inz, 1)) %>%
                                 select(-Art) %>%
-                                pivot_wider(names_from = groesse, values_from = Inz) %>%
+                                pivot_wider(names_from = groesse, values_from = Inz)%>%
                                 select(zeitraum, Mean, Median, Quantil_75, Quantil_90, Max)
-                      
 
 data_diff_ges %>% DT::datatable(
                 rownames = F,
@@ -184,14 +182,13 @@ data_diff_ges %>% DT::datatable(
                   autoWidth = F))
 
 
-#data_diff %>%
- # mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
- # gather("Art", "Delta", 12:17) %>%
- # ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
- # geom_boxplot(aes(fill=Art), outlier.alpha = 0.5) +
-  #ylim(0, 10) +
- # facet_grid(.~Art)+
- # theme(legend.position = "none")
+data_diff %>%
+ mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+ pivot_longer(names_to = "Art", values_to= "Delta", 12:17) %>%
+ ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
+ geom_boxplot(aes(fill=Art), outlier.alpha = 0.5) +
+ facet_grid(.~Art)+
+ theme(legend.position = "none")
 
 ```
 
@@ -199,7 +196,7 @@ data_diff_ges %>% DT::datatable(
 
 Aus unseren vorngehenden Recherchen wissen wir, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten. Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend.
 
--> Tabelle zeigt die Abweichungen, wenn zuvor alle Fälle mit einer Startinzidenz > 180 heraugeiltert wurden
+-> Tabelle zeigt die Abweichungen, wenn zuvor alle Fälle mit einer Startinzidenz > 180 herausgefiltert wurden
 
 ````{r}
 
@@ -208,7 +205,7 @@ data_diff_rel <- data_diff %>%  filter(Datenstand <= 180 %>%
                                 summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
                                              funs(mean, median, max, quartil=quantile(., probs = 0.75), 
                                                   quantil=quantile(., probs = 0.9)),na.rm = TRUE) %>%
-                                gather("Art","Inz") %>%
+                                pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
                                                       (grepl("2",Art)==TRUE)  ~ "nach_2",
                                                       (grepl("3",Art)==TRUE)  ~ "nach_3",
@@ -235,8 +232,58 @@ data_diff_rel %>% DT::datatable(
 
 
 ````
+Das Filtern nach Datenstand > 180 entfernt rund 16.000 von 26.000 Einträgen. Die Durchschnittswerte erscheinen im gesamten höher - gegen die intuitive Erwartung, dass Abweichungen bei sinkenden Fallzahlen kleiner werden. 
+
+Für die folgende Tabelle wurden die 80 Landkreise (20%) herausgenommen, die im betrachteten Zeitraum (seit dem 1. März) die größte Durchschnittsinzidenz (mean) hatten. Dabei fallen lediglich 5200 Einträge heraus  (80*65)  (Datenstand: 4. Mai 2021)
+
+```{r}
+
+`%ni%` = Negate(`%in%`)
+
+data_diff_lk <- data_diff %>% 
+  mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
+  group_by(Ags,Rkiname) %>%
+  summarise_at(vars(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE) %>%
+  select(-c("Datenstand_median","Datenstand_max"))
+
+lk_max <- top_n(ungroup(data_diff_lk),80,Datenstand_mean) %>%
+          select(Ags)
+lk_max <- as.vector(unlist(lk_max))
 
 
+
+data_diff_om <- data_diff %>%  subset(Ags %ni% lk_max) %>%
+                                mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+                                summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
+                                             funs(mean, median, max, quartil=quantile(., probs = 0.75), 
+                                                  quantil=quantile(., probs = 0.9)),na.rm = TRUE) %>%
+                                pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
+                                mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
+                                                      (grepl("2",Art)==TRUE)  ~ "nach_2",
+                                                      (grepl("3",Art)==TRUE)  ~ "nach_3",
+                                                      (grepl("_4",Art,fixed =TRUE)==TRUE )  ~ "nach_4",
+                                                      (grepl("5",Art)==TRUE)  ~ "nach_5",
+                                                      (grepl("I4",Art,fixed =TRUE)==TRUE)  ~ "nach_I4")) %>%
+                                mutate(groesse = case_when((grepl("mean",Art)==TRUE)  ~ "Mean",
+                                                      (grepl("median",Art)==TRUE)  ~ "Median",
+                                                      (grepl("max",Art)==TRUE)  ~ "Max",
+                                                      (grepl("quartil",Art)==TRUE)  ~ "Quantil_75",
+                                                      (grepl("quantil",Art)==TRUE)  ~ "Quantil_90"))%>%
+                                mutate(Inz = round(Inz, 1)) %>%
+                                select(-Art) %>%
+                                pivot_wider(names_from = groesse, values_from = Inz) %>%
+                                select(zeitraum, Mean, Median, Quantil_75, Quantil_90, Max)
+                      
+
+data_diff_om %>% DT::datatable(
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  pageLength = 6,
+                  autoWidth = F))
+
+
+```
 
 #### Feinere Betrachtung der Differenzen
 
@@ -253,7 +300,7 @@ data_diff_bl <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, de
                 mutate(name = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"), .after = "Bl")
 
 data_diff_bl %>% 
-  gather("Tage", "Mean_Delta", 3:8) %>%
+  pivot_longer(names_to= "Tage", values_to = "Mean_Delta", 3:8) %>%
   ggplot(aes(x=Tage,y=Mean_Delta, group=name))+
   geom_point() +
   facet_wrap(.~name)+
@@ -261,7 +308,7 @@ data_diff_bl %>%
   theme(legend.position = "none")
 
 data_diff_bl %>% 
-  gather("Tage", "Median_Delta", 9:14) %>%
+  pivot_longer(names_to= "Tage", values_to = "Median_Delta", 9:14) %>%
   ggplot(aes(x=Tage,y=Median_Delta, group=name))+
   geom_point() +
   facet_wrap(.~name)+
@@ -269,7 +316,7 @@ data_diff_bl %>%
   theme(legend.position = "none")
 
 data_diff_bl %>% 
-  gather("Tage", "Quantile_Delta", 15:20) %>%
+  pivot_longer(names_to= "Tage", values_to = "Quantile_Delta", 15:20) %>%
   ggplot(aes(x=Tage,y=Quantile_Delta, group=name))+
   geom_point() +
   facet_wrap(.~name)+
@@ -283,11 +330,6 @@ data_diff_bl %>%
  - nach Landkreisen:
 
 ```{r}
-data_diff_lk <- data_diff %>% 
-  mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
-  group_by(Ags,Rkiname) %>%
-  summarise_at(vars(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE) %>%
-  select(-c("Datenstand_median","Datenstand_max"))
 
 data_diff_lk %>% 
   DT::datatable(extensions = c("Buttons","FixedColumns"),
@@ -301,7 +343,7 @@ data_diff_lk %>%
 
 
 data_diff_lk %>% 
-  gather("Art", "Delta_Med", 10:15) %>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", 10:15) %>%
    filter(Art %in% c("delta_1_median","delta_3_median","delta_5_median"))%>%
   ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art)) +
@@ -322,7 +364,7 @@ data_diff_d <- data_diff %>%
   summarise_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
 
 data_diff_d %>% 
-  gather("Art", "Delta_Med", 8:13) %>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", 8:13) %>%
   filter(Art %in% c("delta_1_median","delta_3_median","delta_5_median"))%>%
   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art)) +
@@ -332,7 +374,7 @@ data_diff_d %>%
   theme(legend.position = "none")
 
 # data_diff_d %>% 
-#   gather("Art", "Delta_Med", 8:13) %>%
+#   pivot_longer(names_to="Art", values_to="Delta_Med", 8:13) %>%
 #   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
 #   geom_boxplot(aes(fill=Art)) +
 #   facet_grid(.~Art)+
@@ -361,7 +403,7 @@ data_diff_wd %>%
                   autoWidth = T))
 
 data_diff_wd %>% 
-  gather("Tage", "delta_agg", c(2, 4, 6, 8, 10, 12, 14, 16, 18)) %>%
+  pivot_longer(names_to="Tage", values_to="delta_agg", c(2, 4, 6, 8, 10, 12, 14, 16, 18)) %>%
   ggplot(aes(x=weekday,y=delta_agg, group=Tage))+
   geom_point() +
   facet_wrap(.~Tage)+
@@ -377,7 +419,7 @@ Die Differenz zwischen dem aktuellsten und dem "ersten" Datenstand wird in einem
 
 
 
-```{r, echo=F}
+```{r}
 
 ######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
 
@@ -385,7 +427,7 @@ data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeit
                                                 datenstand == max(datenstand) ~ "Neu")) %>%
                         filter(., !is.na(Ind)) %>%
                         select(., -datenstand) %>%
-                        spread(., Ind, Inzidenz )
+                        pivot_wider(names_from= Ind,values_from= Inzidenz )
 
 # Such einen Kreis aus, bsp. Schwabach
 lk = "SK München"
