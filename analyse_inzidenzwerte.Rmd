@@ -184,16 +184,57 @@ data_diff_ges %>% DT::datatable(
                   autoWidth = F))
 
 
-data_diff %>%
-  mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
-  gather("Art", "Delta", 12:17) %>%
-  ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
-  geom_boxplot(aes(fill=Art), outlier.alpha = 0.5) +
-  ylim(0, 10) +
-  facet_grid(.~Art)+
-  theme(legend.position = "none")
+#data_diff %>%
+ # mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+ # gather("Art", "Delta", 12:17) %>%
+ # ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
+ # geom_boxplot(aes(fill=Art), outlier.alpha = 0.5) +
+  #ylim(0, 10) +
+ # facet_grid(.~Art)+
+ # theme(legend.position = "none")
 
 ```
+
+#### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
+
+Aus unseren vorngehenden Recherchen wissen wir, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten. Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend.
+
+-> Tabelle zeigt die Abweichungen, wenn zuvor alle Fälle mit einer Startinzidenz > 180 heraugeiltert wurden
+
+````{r}
+
+data_diff_rel <- data_diff %>%  filter(Datenstand <= "180") %>%
+                                mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+                                summarise_at(vars(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4), 
+                                             funs(mean, median, max, quartil=quantile(., probs = 0.75), 
+                                                  quantil=quantile(., probs = 0.9)),na.rm = TRUE) %>%
+                                gather("Art","Inz") %>%
+                                mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
+                                                      (grepl("2",Art)==TRUE)  ~ "nach_2",
+                                                      (grepl("3",Art)==TRUE)  ~ "nach_3",
+                                                      (grepl("_4",Art,fixed =TRUE)==TRUE )  ~ "nach_4",
+                                                      (grepl("5",Art)==TRUE)  ~ "nach_5",
+                                                      (grepl("I4",Art,fixed =TRUE)==TRUE)  ~ "nach_I4")) %>%
+                                mutate(groesse = case_when((grepl("mean",Art)==TRUE)  ~ "Mean",
+                                                      (grepl("median",Art)==TRUE)  ~ "Median",
+                                                      (grepl("max",Art)==TRUE)  ~ "Max",
+                                                      (grepl("quartil",Art)==TRUE)  ~ "Quantil_75",
+                                                      (grepl("quantil",Art)==TRUE)  ~ "Quantil_90"))%>%
+                                mutate(Inz = round(Inz, 1)) %>%
+                                select(-Art) %>%
+                                pivot_wider(names_from = groesse, values_from = Inz) %>%
+                                select(zeitraum, Mean, Median, Quantil_75, Quantil_90, Max)
+                      
+
+data_diff_rel %>% DT::datatable(
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  pageLength = 6,
+                  autoWidth = F))
+
+
+````
 
 
 
@@ -208,27 +249,31 @@ data_diff <- data_diff %>%
 
 data_diff_bl <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
                 group_by(Bl) %>%
-                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE)
+                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE) %>%
+                mutate(name = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"), .after = "Bl")
 
 data_diff_bl %>% 
-  gather("Tage", "Mean_Delta", 2:7) %>%
-  ggplot(aes(x=Tage,y=Mean_Delta, group=Bl))+
+  gather("Tage", "Mean_Delta", 3:8) %>%
+  ggplot(aes(x=Tage,y=Mean_Delta, group=name))+
   geom_point() +
-  facet_wrap(.~Bl)+
+  facet_wrap(.~name)+
+  scale_x_discrete(labels= c(1,2,3,4,5,14))+
   theme(legend.position = "none")
 
 data_diff_bl %>% 
-  gather("Tage", "Median_Delta", 8:13) %>%
-  ggplot(aes(x=Tage,y=Median_Delta, group=Bl))+
+  gather("Tage", "Median_Delta", 9:14) %>%
+  ggplot(aes(x=Tage,y=Median_Delta, group=name))+
   geom_point() +
-  facet_wrap(.~Bl)+
+  facet_wrap(.~name)+
+  scale_x_discrete(labels= c(1,2,3,4,5,14))+
   theme(legend.position = "none")
 
 data_diff_bl %>% 
-  gather("Tage", "Quantile_Delta", 14:19) %>%
-  ggplot(aes(x=Tage,y=Quantile_Delta, group=Bl))+
+  gather("Tage", "Quantile_Delta", 15:20) %>%
+  ggplot(aes(x=Tage,y=Quantile_Delta, group=name))+
   geom_point() +
-  facet_wrap(.~Bl)+
+  facet_wrap(.~name)+
+  scale_x_discrete(labels= c(1,2,3,4,5,14))+
   theme(legend.position = "none")
 
 
@@ -238,15 +283,26 @@ data_diff_bl %>%
  - nach Landkreisen:
 
 ```{r}
-
 data_diff_lk <- data_diff %>% 
   mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
   group_by(Ags,Rkiname) %>%
-  summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
+  summarise_at(vars(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE) %>%
+  select(-c("Datenstand_median","Datenstand_max"))
+
+data_diff_lk %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 7,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
 
 
 data_diff_lk %>% 
-  gather("Art", "Delta_Med", 9:14) %>%
+  gather("Art", "Delta_Med", 10:15) %>%
+   filter(Art %in% c("delta_1_median","delta_3_median","delta_5_median"))%>%
   ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art)) +
   facet_grid(Art~.)+
@@ -267,6 +323,7 @@ data_diff_d <- data_diff %>%
 
 data_diff_d %>% 
   gather("Art", "Delta_Med", 8:13) %>%
+  filter(Art %in% c("delta_1_median","delta_3_median","delta_5_median"))%>%
   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art)) +
   geom_smooth()+
