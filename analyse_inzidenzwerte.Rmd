@@ -63,7 +63,7 @@ Mit dem im Repo gespeicherten Script wird auf dieses Archiv zugegriffen und die 
 
 ## Analyse
 
-#### Einlesen
+### Einlesen
 
 Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Zeitraum wird ausgewählt -> Start= 2021-03-01
 
@@ -84,7 +84,7 @@ data$tag_nach_meldezeitraum <- ymd(data$tag_nach_meldezeitraum)
 ```
 
 
-#### 7-Tage-Inzidenz berechnen
+### 7-Tage-Inzidenz berechnen
 
 Maßgeblich für die Analyse ist der Vergleich der Inzidenzwerte der Landkreise -> Berechnung der Werte aus den 7-Tage-Fallzahlen und der Bevölkerungsinformation aus der Kreise-Datei
 
@@ -129,7 +129,7 @@ data_long <- data_inz %>% pivot_longer(names_to = "Ags", values_to = "Inzidenz",
 
 
 
-#### Durchschnittliche Differenz nach n Tagen
+### Durchschnittliche Differenz nach n Tagen
 
 Der "erste" inzidenzwert wird für jede Kombination aus Landkreis/Stadt und Meldedatum dem entsprechenden Wert nach den Datenständen einen, zwei, drei, vier, fünf und vierzehn Tage später gegenübergestellt.
 
@@ -192,7 +192,7 @@ data_diff %>%
 
 ```
 
-#### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
+### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
 
 Aus unseren vorngehenden Recherchen wissen wir, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten. Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend.
 
@@ -285,9 +285,11 @@ data_diff_om %>% DT::datatable(
 
 ```
 
-#### Feinere Betrachtung der Differenzen
+### Feinere Betrachtung der Differenzen
 
- - nach Bundesländern:
+#### Nach Bundesländern:
+
+- Gibt es innerhalb der bereits betrachteten Indikatoren und Zeiträumen große Unterschiede zwischen den Bundesländern?
 
 ```{r}
 
@@ -296,8 +298,9 @@ data_diff <- data_diff %>%
 
 data_diff_bl <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
                 group_by(Bl) %>%
-                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE) %>%
+                summarise_at(vars(delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE)%>%
                 mutate(name = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"), .after = "Bl")
+
 
 data_diff_bl %>% 
   pivot_longer(names_to= "Tage", values_to = "Mean_Delta", 3:8) %>%
@@ -326,8 +329,40 @@ data_diff_bl %>%
 
 ``` 
  
+- Hängen die Unterschiede zwischen den Bundesländern mit hohen Fallzahlen bzw. hohen Inzidenzen zusammen?
+
+```{r}
+
+index_bl <- tibble(Bl=(c("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16")), name=(c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"))) 
+
+data_diff_bl_tag <- data_diff %>% mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
+                group_by(Bl, tag_nach_meldezeitraum) %>%
+                summarise_at(vars(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), funs(mean, median, quantile(., probs = 0.75), max, sd, mad), na.rm = TRUE) %>%
+                select(-c("Datenstand_median","Datenstand_max","Datenstand_sd","Datenstand_mad"))%>%
+                left_join(., index_bl, by = "Bl")%>%
+                subset(., select=c(41,1:40))%>%
+                ungroup()
+
+
+data_diff_bl_tag %>% 
+  pivot_longer(names_to="Art", values_to="Delta_Mean", 5:10) %>%
+   filter(Art %in% c("delta_1_mean"))%>%
+  ggplot()+
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Delta_Mean*10, color=br24_colours[4])) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand_mean, color=br24_colours[2]))+
+  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "14 days") +
+  facet_wrap(.~name)+
+  scale_y_continuous(name = "Inzidenz", sec.axis = sec_axis(~./10, name = "Abweichung")) + 
+  xlab("Tag_nach_Meldezeitraum") +
+  theme(legend.position = "none",panel.grid.major.x = element_line(colour = "grey"),
+        axis.text.x = element_text(angle = 90))+
+  ggtitle("blau = Mean Inzidenz | orange = Mean Abweichung nach 1 Tag")
+
+
+```
  
- - nach Landkreisen:
+ 
+#### Nach Landkreisen:
 
 ```{r}
 
@@ -355,7 +390,7 @@ data_diff_lk %>%
 
 ```
 
-- nach Tagen:
+#### Nach Tagen:
 
 ```{r}
 data_diff_d <- data_diff %>%
@@ -383,7 +418,7 @@ data_diff_d %>%
 
 ```
 
-- nach Wochentagen
+#### Nach Wochentagen
 
 ```{r}
 data_diff_wd <- data_diff %>%
@@ -413,7 +448,7 @@ data_diff_wd %>%
 ```
 
 
-#### Differenz: Aktuellster und "erster" Datenstand
+### Differenz: Aktuellster und "erster" Datenstand
 
 Die Differenz zwischen dem aktuellsten und dem "ersten" Datenstand wird in einem gesonderten Frame gespeichert, um beispielhaft das aktuell größte Ausmaß der Abweichungen zeigen zu können:
 
@@ -428,9 +463,11 @@ data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeit
                         filter(., !is.na(Ind)) %>%
                         select(., -datenstand) %>%
                         pivot_wider(names_from= Ind,values_from= Inzidenz )
+```
 
+```{r}
 # Such einen Kreis aus, bsp. Schwabach
-lk = "SK München"
+lk = "SK Regensburg"
 
 # So unterscheidet sich die Inzidenz zum Datenstand und die "reale" Inzidenz:
 data_vg %>%
