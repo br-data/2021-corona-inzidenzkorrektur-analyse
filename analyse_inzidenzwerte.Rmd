@@ -73,13 +73,17 @@ Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Zeitraum wird ausgew
 ```{r}
 
 data <- read_csv("./input/matrix_fallzahlen_7tage.csv")
-
+data_faelle <- read_csv("./input/matrix_fallzahlen_datenstand.csv")
 kreise <- read_csv("./input/Kreise-Dtl-2019.csv")
 
-data <- data %>% filter(datenstand >= "2021-03-01" & tag_nach_meldezeitraum >= "2021-03-01")
-
 data$datenstand <- ymd(data$datenstand)
-data$tag_nach_meldezeitraum <- ymd(data$tag_nach_meldezeitraum) 
+data$tag_nach_meldezeitraum <- ymd(data$tag_nach_meldezeitraum)
+data$faelle <- ymd(data$datenstand)
+
+data <- data %>% filter(datenstand >= "2021-03-01" & tag_nach_meldezeitraum >= "2021-03-01")
+data_faelle <- data_faelle %>% filter(datenstand >= "2021-03-01")
+
+
 
 ```
 
@@ -124,6 +128,10 @@ data_inz <- data_inz %>% mutate_if(is.numeric, function (x) round(x, 1))
 rki_namen <- kreise %>% select(.,c("Ags","Rkiname") )
 data_long <- data_inz %>% pivot_longer(names_to = "Ags", values_to = "Inzidenz", 3:414) %>%
              mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
+             left_join(., rki_namen, by = "Ags")
+
+data_faelle_l <- data_faelle %>% pivot_longer(names_to = "Ags", values_to = "Fallzahl", 2:413) %>%
+             mutate(weekday = lubridate::wday(datenstand, label=TRUE)) %>%
              left_join(., rki_namen, by = "Ags")
 ```
 
@@ -231,9 +239,13 @@ data_diff_rel %>% DT::datatable(
 
 
 ````
-Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen /Datenstand: 5. Mai 2021). Die Durchschnittswerte erscheinen im gesamten höher - gegen die intuitive Erwartung, dass Abweichungen bei sinkenden Fallzahlen kleiner werden. 
 
-Für die folgende Tabelle wurden die 80 Landkreise (20%) herausgenommen, die im betrachteten Zeitraum (seit dem 1. März) die größte Durchschnittsinzidenz (mean) hatten. Dabei fallen lediglich 5200 Einträge heraus  (80*65)  (Datenstand: 5. Mai 2021)
+Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen (Datenstand: 5. Mai 2021). Die zusammenfassenden Größen sind alle etwas niederer, im Vergleich zur Betrachtung des gesamten Datensatzes. 
+
+Für die folgende Tabelle wurden die 80 Landkreise (20%) herausgenommen, die im betrachteten Zeitraum (seit dem 1. März) die größte Durchschnittsinzidenz (mean) hatten. Dabei fallen lediglich 5200 Einträge heraus  (80*65)  (Datenstand: 5. Mai 2021). Auch hier stellen sich die Werte wieder leicht niederer dar.
+
+-> Indikation dafür, dass die Höhe der Inzidenz mit der Abweichung in einem gewissen Maß zusammenhängt.
+
 
 ```{r}
 
@@ -388,8 +400,6 @@ data_diff_lk %>%
   theme(panel.grid.major.x = element_line(colour = "grey"))
 ```
 
-- Hängen die Unterschiede zwischen den Bundesländern mit hohen Fallzahlen bzw. hohen Inzidenzen zusammen?
-
 
 ```{r}
 data_diff_lk %>%
@@ -401,6 +411,8 @@ data_diff_lk %>%
 
 
 #### Nach Tagen:
+
+Wie sehen die durchschnittlichen Abweichungen im zeitlichen Verlauf aus? Gibt es einen Zusammenhang zwischen höheren Abweichungen und höheren Fallzahlen?
 
 ```{r}
 
@@ -464,6 +476,34 @@ data_diff_wd %>%
 
 ```
 
+
+Verteilung der Abweichungen nach Wochentagen entspricht nicht der intuitiven Annahme, dass die Inzidenzen der Wochenenden stärker bereinigt werden müssen. Vermutung: Da es unter der Woche sehr viel mehr Fallmeldungen gibt, als am Wochenende, kommt es hier zu mehr Berichtigungen. Die Fallzahlen sind zwar am Wocheende generell (zu) niedrig - das bedeutet aber nicht, dass sie am stärksten bereinigt werden müssen.
+
+```{r}
+
+data_faelle_wd <- data_faelle_l %>%
+                  group_by(weekday) %>%
+                  summarise(across(Fallzahl,fun)) %>%
+                  mutate(across(2:4, ~round(.x, digits = 1))) %>%
+                  select(-Fallzahl_max)
+  
+
+data_diff_wd_fl <- left_join(data_diff_wd, data_faelle_wd, by ="weekday") %>%
+                    relocate(Fallzahl_mean,.after = "weekday")%>%
+                    relocate(Fallzahl_med,.before = "delta_1_median")
+
+data_diff_wd_fl %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 7,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+                  
+
+```
 
 ### Differenz: Aktuellster und "erster" Datenstand
 
