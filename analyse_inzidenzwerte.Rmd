@@ -202,17 +202,38 @@ data_diff %>%
 ```
 
 
-### Über den Zusammenhang zwischen Höhe des Inzidenzwert und den resultierenden Abweichungen (nach 1 Tag)
+### Histogramm der Inzidenzwerte und ihr Zusammenhang mit den resultierenden Abweichungen (nach 1 Tag)
 
 ```{r}
+data_diff %>% 
+  # filter(Datenstand < 305) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>% 
+  ggplot() +
+    geom_histogram(mapping = aes(x = Datenstand), binwidth = 10)
+
+# data_diff %>% 
+#   # filter(Datenstand < 305) %>%
+#   mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>% 
+#   count(cut_width(Datenstand, 10))
+
 data_diff %>% 
   filter(Datenstand < 305) %>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
   ggplot(aes(x = Datenstand, y = delta_1)) +
     geom_boxplot(mapping = aes(group = cut_width(Datenstand, 10))) +
-    #geom_boxplot(mapping = aes(group = cut_number(Datenstand, 10))) +
-    theme(panel.grid.major.x = element_line(colour = "grey")) +
-  coord_cartesian(ylim=c(0,10))
+    # geom_boxplot(mapping = aes(group = cut_number(Datenstand, 10))) +
+    stat_summary_bin(
+      geom = "point",
+      binwidth = 10,
+      fun = "mean",
+      col = "black",
+      size = 3,
+      shape = 24,
+      fill = "orange"
+    ) +
+  coord_cartesian(ylim=c(0,20)) +
+  theme(panel.grid.major.x = element_line(colour = "grey"))
+
 ```
 
 
