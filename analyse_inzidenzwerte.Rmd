@@ -231,9 +231,9 @@ data_diff_rel %>% DT::datatable(
 
 
 ````
-Das Filtern nach Datenstand > 180 entfernt rund 16.000 von 26.000 Einträgen. Die Durchschnittswerte erscheinen im gesamten höher - gegen die intuitive Erwartung, dass Abweichungen bei sinkenden Fallzahlen kleiner werden. 
+Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen /Datenstand: 5. Mai 2021). Die Durchschnittswerte erscheinen im gesamten höher - gegen die intuitive Erwartung, dass Abweichungen bei sinkenden Fallzahlen kleiner werden. 
 
-Für die folgende Tabelle wurden die 80 Landkreise (20%) herausgenommen, die im betrachteten Zeitraum (seit dem 1. März) die größte Durchschnittsinzidenz (mean) hatten. Dabei fallen lediglich 5200 Einträge heraus  (80*65)  (Datenstand: 4. Mai 2021)
+Für die folgende Tabelle wurden die 80 Landkreise (20%) herausgenommen, die im betrachteten Zeitraum (seit dem 1. März) die größte Durchschnittsinzidenz (mean) hatten. Dabei fallen lediglich 5200 Einträge heraus  (80*65)  (Datenstand: 5. Mai 2021)
 
 ```{r}
 
@@ -403,14 +403,16 @@ data_diff_lk %>%
 #### Nach Tagen:
 
 ```{r}
+
+fun <- list( mean = ~mean(.x, na.rm = TRUE), med = ~median(.x, na.rm = TRUE), max = ~max(.x, na.rm = TRUE))
+
 data_diff_d <- data_diff %>%
-  mutate_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs) %>%
+  mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs))%>%
   group_by(tag_nach_meldezeitraum) %>%
-  summarise_at(vars(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), funs(mean, median, max), na.rm = TRUE)
+  summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun))
 
 data_diff_d %>% 
-  pivot_longer(names_to="Art", values_to="Delta_Med", 8:13) %>%
-  filter(Art %in% c("delta_1_median","delta_3_median","delta_5_median"))%>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", c(6,12,18)) %>%
   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art)) +
   geom_smooth()+
@@ -418,13 +420,18 @@ data_diff_d %>%
     xlab("Tag nach meldezeitraum") + ylab("Median_Abweichung") +
   theme(legend.position = "none")
 
-# data_diff_d %>% 
-#   pivot_longer(names_to="Art", values_to="Delta_Med", 8:13) %>%
-#   ggplot(aes(x=tag_nach_meldezeitraum,y=Delta_Med, group=Art))+
-#   geom_boxplot(aes(fill=Art)) +
-#   facet_grid(.~Art)+
-#    xlab("Tag nach Meldezeitraum") + ylab("Median Abweichung") +
-#   theme(legend.position = "none")
+
+data_diff_d %>% 
+  pivot_longer(names_to="Art", values_to="Median", c(6,12,18)) %>%
+  ggplot()+
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand_med, color=(br24_colours[1]))) +
+  geom_smooth(aes(x=tag_nach_meldezeitraum,y=Median*10, color= Art))+
+  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "4 days") +
+  scale_y_continuous(name = "Median Inzidenz", sec.axis = sec_axis(~./10, name = "Median Abweichung")) +
+  scale_color_discrete(name = "", labels = c("Median Inz", "delta_1_med","delta_3_med","delta_5_med"))+
+  xlab("Tag_nach_Meldezeitraum") +
+  theme(panel.grid.major.x = element_line(colour = "grey"),
+        axis.text.x = element_text(angle = 90))
 
 ```
 
