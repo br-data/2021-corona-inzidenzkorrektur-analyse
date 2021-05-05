@@ -366,16 +366,30 @@ Wie sehen die durchschnittlichen Abweichungen im zeitlichen Verlauf aus? Gibt es
 data_diff_d <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs))%>%
   group_by(tag_nach_meldezeitraum) %>%
-  summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[1:3]))
+  summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[1:3])) %>%
+  ungroup()
 
+data_faelle_d <- data_faelle_l %>% 
+                 group_by(datenstand) %>%
+                 summarise(across(Fallzahl,mean))%>%
+                 set_names("tag_nach_meldezeitraum","Fallzahl")%>%
+                 ungroup
 
-data_diff_d %>% 
-  pivot_longer(names_to="Art", values_to="Median", c(6,12,18)) %>%
-  ggplot()+
-  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand_med, color=(br24_colours[1]))) +
+data_d_comb <- data_diff_d %>%
+  select(c(1,3,6,12,18))%>%
+  pivot_longer(names_to="Art", values_to="Median", 3:5) %>%
+  left_join(., data_faelle_d, by= "tag_nach_meldezeitraum")
+
+data_d_comb$Fallzahl <- as.integer(data_d_comb$Fallzahl)
+
+data_d_comb %>%
+ggplot()+
+  geom_col(mapping = aes(x= tag_nach_meldezeitraum, y= Fallzahl/3), fill= br24_colours[11], alpha
+           =5/10) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand_med, color=br24_colours[1]),size=1.5) +
   geom_smooth(aes(x=tag_nach_meldezeitraum,y=Median*10, color= Art))+
-  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "4 days") +
-  scale_y_continuous(name = "Median Inzidenz", sec.axis = sec_axis(~./10, name = "Median Abweichung")) +
+  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "3 days") +
+  scale_y_continuous(name = "Inzidenz und Fallzahlen", sec.axis = sec_axis(~./10, name = "Abweichung (Deltas)")) +
   scale_color_discrete(name = "", labels = c("Median Inz", "delta_1_med","delta_3_med","delta_5_med"))+
   xlab("Tag_nach_Meldezeitraum") +
   theme(panel.grid.major.x = element_line(colour = "grey"),
