@@ -183,13 +183,12 @@ data_diff_ges %>% DT::datatable(
 
 
 data_diff %>%
- mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
- pivot_longer(names_to = "Art", values_to= "Delta", 12:17) %>%
- ggplot(aes(x=tag_nach_meldezeitraum,y=Delta, group=Art))+
- geom_boxplot(aes(fill=Art), outlier.alpha = 0.5) +
- facet_grid(.~Art)+
- theme(legend.position = "none")
-
+  mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+  gather("Art", "Delta", 13:18) %>%
+  ggplot(aes(x=Art,y=Delta)) +
+    geom_boxplot(aes(fill=Art), outlier.alpha = 0.5, na.rm = TRUE) +
+    coord_cartesian(ylim=c(0,20)) +
+    theme(legend.position = "none")
 ```
 
 ### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
@@ -387,8 +386,19 @@ data_diff_lk %>%
   theme(legend.position = "none") + 
   scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "", "ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) + 
   theme(panel.grid.major.x = element_line(colour = "grey"))
-
 ```
+
+- Hängen die Unterschiede zwischen den Bundesländern mit hohen Fallzahlen bzw. hohen Inzidenzen zusammen?
+
+
+```{r}
+data_diff_lk %>%
+  ggplot(aes(x = Datenstand_mean, y = delta_1_mean)) +
+  geom_point(alpha = 0.4) + 
+  geom_smooth(method='lm', formula= y~x) +
+  theme(panel.grid.major.x = element_line(colour = "grey"))
+```
+
 
 #### Nach Tagen:
 
