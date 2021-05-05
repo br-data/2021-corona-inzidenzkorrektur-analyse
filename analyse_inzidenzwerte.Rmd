@@ -184,7 +184,7 @@ data_diff_ges %>% DT::datatable(
 
 data_diff %>%
   mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
-  gather("Art", "Delta", 13:18) %>%
+  gather("Art", "Delta", 12:17) %>%
   ggplot(aes(x=Art,y=Delta)) +
     geom_boxplot(aes(fill=Art), outlier.alpha = 0.5, na.rm = TRUE) +
     coord_cartesian(ylim=c(0,20)) +
