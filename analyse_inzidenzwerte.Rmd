@@ -113,7 +113,7 @@ for(i in 1:length(ags)) {
   
 }
 
-data_inz <- data_inz %>% mutate_if(is.numeric, round)
+data_inz <- data_inz %>% mutate_if(is.numeric, function (x) round(x, 1))
 
 
 
