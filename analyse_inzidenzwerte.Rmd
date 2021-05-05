@@ -199,6 +199,23 @@ data_diff %>%
     theme(legend.position = "none")
 ```
 
+
+### Über den Zusammenhang zwischen Höhe des Inzidenzwert und den resultierenden Abweichungen (nach 1 Tag)
+
+```{r}
+data_diff %>% 
+  filter(Datenstand < 305) %>%
+  mutate_at(vars(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs) %>%
+  ggplot(aes(x = Datenstand, y = delta_1)) +
+    geom_boxplot(mapping = aes(group = cut_width(Datenstand, 10))) +
+    #geom_boxplot(mapping = aes(group = cut_number(Datenstand, 10))) +
+    theme(panel.grid.major.x = element_line(colour = "grey")) +
+  coord_cartesian(ylim=c(0,10))
+```
+
+
+
+
 ### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
 
 Aus unseren vorngehenden Recherchen wissen wir, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten. Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend.
@@ -400,6 +417,7 @@ data_diff_lk %>%
   theme(panel.grid.major.x = element_line(colour = "grey"))
 ```
 
+- Zum Zusammenhang zwischen Höhe des Inzidenzwert und Delta
 
 ```{r}
 data_diff_lk %>%
