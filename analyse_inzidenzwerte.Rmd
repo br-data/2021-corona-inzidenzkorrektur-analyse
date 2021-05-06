@@ -241,13 +241,13 @@ data_diff %>%
 
 ### Untersuchung: Welchen Einfluss haben die Abweichungen im "relevanten" Bereich?
 
-Aus unseren vorangehenden Recherchen wissen wir, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten. Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend.
+Der obige Boxplot und auch die vorangehenden Recherchen zeigen, dass ein Grund von Abweichungen hohe Fallzahlen sein können, welche die Gesundheitsämter belasten -  Sind die Unterschiede eventuell nur in den hohen Bereichen so drastisch und im Bereich der Grenzwerte nicht ausschlaggebend? Gleichzeitig beeinflussen niedrige Abweichungen in Landkreisen mit niederigen Fallzahlen entsprehcend die Mittel. 
 
--> Tabelle zeigt die Abweichungen, wenn zuvor alle Fälle mit einer Startinzidenz > 180 herausgefiltert wurden
+-> Tabelle zeigt die Abweichungen, wenn zuvor alle Fälle mit einer Startinzidenz > 200 und < 50 herausgefiltert wurden
 
 ````{r}
 
-data_diff_rel <- data_diff %>% filter(Datenstand <= 180) %>%
+data_diff_rel <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
                                 mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
                                 summarise(across(c(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4),fun[1:5]))%>%
                                 pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
@@ -278,9 +278,9 @@ data_diff_rel %>% DT::datatable(
 
 ````
 
-Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen (Datenstand: 5. Mai 2021). Die zusammenfassenden Größen sind alle etwas niederer, im Vergleich zur Betrachtung des gesamten Datensatzes. 
+Das Filtern entfernt rund 6300 von rund 27.000 Einträgen (Datenstand: 5. Mai 2021). Die zusammenfassenden Größen sind alle leicht niederer, im Vergleich zur Betrachtung des gesamten Datensatzes. 
 
--> Indikation dafür, dass die Höhe der Inzidenz mit der Abweichung in einem gewissen Maß zusammenhängt.
+-> Indikation dafür, dass die Höhe der Inzidenz mit der Abweichung in einem schwachen Ausmaß zusammenhängt.
 
 ### Gegencheck: Wie sieht die Verteilung der gefilterten Fälle aus? Reduziert das Filtern die Datengrundlage für ein Bundesland in unverhältnismäßigem Maß
 
@@ -289,9 +289,9 @@ Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen 
 data_diff <- data_diff %>%
                 mutate(Bl = substr(Ags, 1, 2), .after= "Ags")
 
-Keeps <- data_diff %>% filter(Datenstand <= 180) %>%
+Keeps <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
           select(c(tag_nach_meldezeitraum,Bl,Rkiname,Ags))
-Discards <- data_diff %>% filter(Datenstand > 180) %>%
+Discards <- data_diff %>% filter(Datenstand > 200 | Datenstand < 50 ) %>%
           select(c(tag_nach_meldezeitraum,Bl,Rkiname,Ags))
 
 Discards %>% mutate(Bl = as.numeric(Bl)) %>%
@@ -333,12 +333,12 @@ Discard_Keeps %>%
 
 - Gibt es innerhalb der bereits betrachteten Indikatoren und Zeiträumen große Unterschiede zwischen den Bundesländern?
 
--> Um die Daten besser vergleichbar zu machen, nehmen wir auch hier die Kombinationen aus Landkreisen und Tagen heraus, bei denen die Inzidenz nach dem "ersten" Datenstand über 180 lag 
+-> Um die Daten besser vergleichbar zu machen, nehmen wir auch hier die Kombinationen aus Landkreisen und Tagen heraus, bei denen die Inzidenz nach dem "ersten" Datenstand über 200 und unter 50 lag 
 
 ```{r}
 
 
-data_diff_bl <- data_diff %>% filter(Datenstand <= 180) %>%
+data_diff_bl <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
                 mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
                 group_by(Bl) %>%
                 summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[c(1,2,3,4,6,7)])) %>%
@@ -452,29 +452,27 @@ data_diff_d <- data_diff %>%
 
 data_faelle_d <- data_faelle_l %>% 
                  group_by(datenstand) %>%
-                 summarise(across(Fallzahl,mean))%>%
-                 set_names("tag_nach_meldezeitraum","Fallzahl")%>%
+                 summarise(across(Fallzahl,median))%>%
+                 set_names("tag_nach_meldezeitraum","Fallzahl_Med")%>%
                  ungroup
 
 data_d_comb <- data_diff_d %>%
-  select(c(1,3,6,12,18))%>%
-  pivot_longer(names_to="Art", values_to="Median", 3:5) %>%
+  select(c(1,6))%>%
   left_join(., data_faelle_d, by= "tag_nach_meldezeitraum")
-
-data_d_comb$Fallzahl <- as.integer(data_d_comb$Fallzahl)
 
 data_d_comb %>%
 ggplot()+
-  geom_col(mapping = aes(x= tag_nach_meldezeitraum, y= Fallzahl/3), fill= br24_colours[11], alpha
+  geom_col(mapping = aes(x= tag_nach_meldezeitraum, y= Fallzahl_Med/3), fill= br24_colours[11], alpha
            =5/10) +
-  geom_line(aes(x=tag_nach_meldezeitraum,y=Datenstand_med, color=br24_colours[1]),size=1.5) +
-  geom_smooth(aes(x=tag_nach_meldezeitraum,y=Median*10, color= Art))+
+  geom_point(aes(x=tag_nach_meldezeitraum,y=delta_1_med*10))+
+  geom_smooth(aes(x=tag_nach_meldezeitraum,y=delta_1_med*10))+
   scale_x_date(labels = scales::date_format("%d.%m"), breaks = "3 days") +
-  scale_y_continuous(name = "Inzidenz und Fallzahlen", sec.axis = sec_axis(~./10, name = "Abweichung (Deltas)")) +
-  scale_color_discrete(name = "", labels = c("Median Inz", "delta_1_med","delta_3_med","delta_5_med"))+
+  scale_y_continuous(name = "Median Fälle pro Landkreis", sec.axis = sec_axis(~./10, name = "Median Abweich. nach 1 Tag)")) +
   xlab("Tag_nach_Meldezeitraum") +
   theme(panel.grid.major.x = element_line(colour = "grey"),
         axis.text.x = element_text(angle = 90))
+
+
 
 ```
 
