@@ -307,8 +307,9 @@ Discard_Keeps <- Discard_Keeps %>%
                   set_names(c("Nr","Keeps","Discards")) %>%
                   mutate(Bl = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"),
                          .after = "Nr")%>%
-                  mutate("%" = Discards/Keeps*100, .after = "Discards") %>%
-                  mutate_if(is.numeric, function (x) round(x, 1))
+                  mutate("Percentage" = (Discards/(Discards+Keeps)), .after = "Discards")%>%
+                  mutate_if(is.numeric, function (x) round(x, 4))%>%
+                  mutate(Percentage = scales::percent(Percentage,accuracy=0.1)) 
 
 Discard_Keeps %>% 
   DT::datatable(extensions = c("Buttons","FixedColumns"),
@@ -343,6 +344,24 @@ data_diff_bl <- data_diff %>% filter(Datenstand <= 180) %>%
                 summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[c(1,2,3,4,6,7)])) %>%
                 mutate(name = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"), .after = "Bl") %>%
                 mutate_if(is.numeric, function (x) round(x, 1))
+
+data_diff_bl_table <- data_diff_bl %>%
+                      relocate(Bl,name,Datenstand_mean,Datenstand_med,delta_1_mean,delta_1_med,delta_2_mean,delta_2_med,
+                               delta_3_mean,delta_3_med,delta_4_mean,delta_4_med,delta_5_mean,delta_5_med,
+                               delta_I4_mean,delta_I4_med,Datenstand_max,delta_1_max,delta_3_max,delta_5_max,Datenstand_quart,
+                               delta_1_quart,delta_3_quart,delta_5_quart,Datenstand_sd,delta_1_sd,delta_3_sd,delta_5_sd) %>%
+                      select(1:28) %>%
+                      rename( Inzidenz_mean = Datenstand_mean, Inzidenz_med = Datenstand_med)
+
+data_diff_bl_table %>%
+DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 17,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
 
 
 data_diff_bl %>% 
