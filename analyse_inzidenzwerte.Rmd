@@ -282,6 +282,49 @@ Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen 
 
 -> Indikation dafür, dass die Höhe der Inzidenz mit der Abweichung in einem gewissen Maß zusammenhängt.
 
+### Gegencheck: Wie sieht die Verteilung der gefilterten Fälle aus? Reduziert das Filtern die Datengrundlage für ein Bundesland in unverhältnismäßigem Maß
+
+```{r}
+
+data_diff <- data_diff %>%
+                mutate(Bl = substr(Ags, 1, 2), .after= "Ags")
+
+Keeps <- data_diff %>% filter(Datenstand <= 180) %>%
+          select(c(tag_nach_meldezeitraum,Bl,Rkiname,Ags))
+Discards <- data_diff %>% filter(Datenstand > 180) %>%
+          select(c(tag_nach_meldezeitraum,Bl,Rkiname,Ags))
+
+Discards %>% mutate(Bl = as.numeric(Bl)) %>%
+  ggplot() +
+    geom_histogram(mapping = aes(x = Bl), binwidth = 1)+
+  scale_x_continuous(labels=c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH")
+                     ,breaks = c(1:16))+
+  ylim(0,1500)+
+  ggtitle("Herausgenommene Einträge (Tag+Landkreis) pro Bundesland")
+
+Discard_Keeps <- left_join( (Keeps %>% count(Bl)),(Discards%>% count(Bl)), by = "Bl")
+Discard_Keeps <- Discard_Keeps %>% 
+                  set_names(c("Nr","Keeps","Discards")) %>%
+                  mutate(Bl = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"),
+                         .after = "Nr")%>%
+                  mutate("%" = Discards/Keeps*100, .after = "Discards") %>%
+                  mutate_if(is.numeric, function (x) round(x, 1))
+
+Discard_Keeps %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 16,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = F))
+
+
+
+```
+
+
 
 ### Feinere Betrachtung der Differenzen
 
@@ -293,8 +336,6 @@ Das Filtern nach Datenstand > 180 entfernt rund 4600 von rund 27.000 Einträgen 
 
 ```{r}
 
-data_diff <- data_diff %>%
-                mutate(Bl = substr(Ags, 1, 2), .after= "Ags")
 
 data_diff_bl <- data_diff %>% filter(Datenstand <= 180) %>%
                 mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
