@@ -166,6 +166,7 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
                                       delta_5 = nach_5-Datenstand,delta_I4=nach_14-Datenstand) 
 
 data_diff_ges <- data_diff %>% mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
+                                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
                                 summarise(across(c(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4),fun[1:5])) %>%
                                 pivot_longer(names_to = "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
@@ -201,6 +202,8 @@ data_diff %>%
     theme(legend.position = "none")
 ```
 
+Die durchschnittlichen Abweichungen sehen wie folgt aus:
+
 
 ### Histogramm der Inzidenzwerte und ihr Zusammenhang mit den resultierenden Abweichungen (nach 1 Tag)
 
@@ -219,6 +222,7 @@ data_diff %>%
 data_diff %>% 
   filter(Datenstand < 305) %>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   ggplot(aes(x = Datenstand, y = delta_1)) +
     geom_boxplot(mapping = aes(group = cut_width(Datenstand, 10))) +
     # geom_boxplot(mapping = aes(group = cut_number(Datenstand, 10))) +
@@ -249,6 +253,7 @@ Der obige Boxplot und auch die vorangehenden Recherchen zeigen, dass ein Grund v
 
 data_diff_rel <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
                                 mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
+                                # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
                                 summarise(across(c(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4),fun[1:5]))%>%
                                 pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
@@ -340,6 +345,7 @@ Discard_Keeps %>%
 
 data_diff_bl <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
                 mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
+                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
                 group_by(Bl) %>%
                 summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[c(1,2,3,4,6,7)])) %>%
                 mutate(name = c("SH", "HH", "NI", "HB", "NW", "HE", "RP", "BW", "BY", "SL", "BE", "BB", "MV", "SN", "ST", "TH"), .after = "Bl") %>%
@@ -401,6 +407,7 @@ Die Tabelle zeigt pro Landkreis den durchschnittlichen Inzidenzwert (Datenstand_
 
 data_diff_lk <- data_diff %>% 
   mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   group_by(Ags,Rkiname) %>%
   summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[1:3])) %>%
   select(-c("Datenstand_med","Datenstand_max"))
@@ -446,6 +453,7 @@ Wie sehen die durchschnittlichen Abweichungen im zeitlichen Verlauf aus? Gibt es
 
 data_diff_d <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs))%>%
+  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   group_by(tag_nach_meldezeitraum) %>%
   summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[1:3])) %>%
   ungroup()
@@ -485,6 +493,7 @@ Vermutung: Da es unter der Woche sehr viel mehr Fallmeldungen gibt, als am Woche
 ```{r}
 data_diff_wd <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
+  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   group_by(weekday) %>%
   summarise(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[c(1,2,4)])) %>%
   mutate(across(2:19, ~round(.x, digits = 1)))
