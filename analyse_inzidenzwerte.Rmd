@@ -418,7 +418,7 @@ data_diff_lk <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_5,delta_7, delta_I4), abs)) %>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(Ags,Rkiname) %>%
-  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:3])) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:4])) %>%
   select(-c("Inzidenz_med","Inzidenz_max"))
 
 data_diff_lk %>% mutate_if(is.numeric, function (x) round(x, 1)) %>%
@@ -436,14 +436,26 @@ data_diff_lk %>% mutate_if(is.numeric, function (x) round(x, 1)) %>%
 - Zum Zusammenhang zwischen Höhe des Inzidenzwert und Delta
 
 ```{r}
+# data_diff_lk %>%
+#   ggplot(aes(x = Inzidenz_mean, y = delta_1_mean)) +
+#   geom_point(alpha = 0.4) + 
+#   geom_smooth(method='lm', formula= y~x) +
+#   theme(panel.grid.major.x = element_line(colour = "grey"))+
+#    xlab("Durchschnittliche Inzidenz (mean) der Landkreise") + ylab("Mean prozent. Abweichung nach 1 Tag") +
+#   ggtitle("Abweichung der Inzidenzen gegen die Höhe der durchschnittlichen Inzidenz", 
+#           subtitle = "Jeder Punkt stellt einen Landkreis dar")
+
 data_diff_lk %>%
-  ggplot(aes(x = Inzidenz_mean, y = delta_1_mean)) +
-  geom_point(alpha = 0.4) + 
-  geom_smooth(method='lm', formula= y~x) +
+  pivot_longer(names_to="Art", values_to="Delta_Med", c(8, 14)) %>%
+  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+  geom_point(aes(color=Art), alpha = 0.5) +
+  facet_grid(Art~.)+
+  xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "    SN", " ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
   theme(panel.grid.major.x = element_line(colour = "grey"))+
-   xlab("Durchschnittliche Inzidenz (mean) der Landkreise") + ylab("Mean prozent. Abweichung nach 1 Tag") +
-  ggtitle("Abweichung der Inzidenzen gegen die Höhe der durchschnittlichen Inzidenz", 
-          subtitle = "Jeder Punkt stellt einen Landkreis dar")
+  xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
+  ggtitle("Abweichung der Inzidenzen nach 1,3, und 5 Tagen in den Landkreisen - Median ")
 ```
 
 
