@@ -1,0 +1,418 @@
+---
+title: "Analyse Inzidenzkorrektur"
+date: "`r format(Sys.time(), format='%d. %B %Y, %H:%M Uhr')`"
+author: "Oliver Schnuck, Claudia Kohler" 
+output:
+  html_document:
+    template: ./lib/template/template.html
+    theme: null
+    mathjax: null
+    pandoc_args: 
+      - --to=html5
+    self_contained: true
+    section_divs: no
+    toc: true
+    css: "./lib/template/style/style.css"
+---
+
+
+```{r setup, include=F}
+
+knitr::opts_chunk$set(echo=F,
+                      message=F,
+                      warning=F,
+                      attr.source=".code .infobox")
+
+if (!require ("tidyverse")) {
+   install.packages("tidyverse")
+   library(tidyverse)
+}
+  
+if (!require ("lubridate")) {
+   install.packages("lubridate")
+   library(lubridate)
+}
+
+if (!require ("dplyr")) {
+   install.packages("dplyr")
+   library(dplyr)
+}
+
+# Load colors, ggplot2 config...
+source("./lib/template/style/style.R")
+
+```
+
+# Über die Analyse
+
+Diese Analyse beschäftigt sich mit den Covid-19-Fallzahl-Daten, die seit Beginn der Corona-Pandemie im Januar 2020 in Deutschland vom Robert-Koch-Institut gesammelt werden. Seit Mai 2020 wird aus diesen Daten die 7-Tage-Inzidenz für Covid-Fälle auf Ebene deutschen Landkreise und kreisfreien Städte berechnet:
+
+7-Tage-Inzidenz = 7-Tage-Fallzahl (nach Meldedatum) / Bevölkerung eines Landkreises * 100.000
+
+Dieser Wert gilt seitdem als Messgröße für regionales Infektionsgeschehen, seit November 2020 steht er als Indikator für die Ergreifung von Maßnahmen gegen die Ausbreitung von Covid-19 im deutschen Infektionsschutzgesetz. Die Fallmeldungen, de täglich beim RKI eingehen, sind, besonders für die jüngsten Tage, häufig zu niedrig - sie können rückblickend durch Nachmeldungen korrigiert werden.
+
+Allerdings sind diese korrigierten Zahlen, aus denen sich auch korrigierte Inzidenzwerte errechnen lassen, nicht maßgeblich für die Corona-Regelungen. Hier soll gezeigt werden, wie groß die Auswirkunn der Meldeverzögerung rückblickend auf die Inzidenzen ist, in welchem Zeitfenster die größte "Korrektur" stattfindet und wie die Unterschiede auf verschiedenen Ebenen aussehen.
+
+## Über die Daten
+
+Das RKI ergänzt den Datensatz der Covid-19-Fallmeldungen täglich um die neu gemeldeten Fälle. Michael Kreil hat für "ARD Data" diesen Datensatz täglich archiviert, sodass die Fallzahlen und Inzidenzen für einen bestimmten Tag mit den Datenständen verschiedener Tage betrachtet werden können. Daraus ergeben sich die zwei für unsere Analyse zentralen Datumsangaben:
+
+Datenstand = Tag, an dem das RKI veröffentlicht hat
+tag_nach_meldezeitraum = Tag, für den die Fallzahlen/ 7-Tage-Inzidenzen "ausschlaggebend" waren
+
+Mit dem im Repo gespeicherten Script wird auf dieses Archiv zugegriffen und die 7-Tage-Fallzahlen für jede Kombination aus Übertragungsdatum, Meldedatum und Landkreis seit dem 1. Januar 2021 aggregiert. Die entsprechende csv.-Datei liegt, ebenso wie eine csv mit den Bevölkerungs- und Geodaten der Landkreise im Ordner input.
+
+# Analyse
+
+## Vorbereitung
+
+### Daten 
+
+Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Analysezeitraum wird gewählt. Wir haben uns für den Abschnitt seit dem 1. März 2021 entschieden - dem Beginn der sogenannten dritten Welle.
+
+```{r}
+
+data <- read_csv("./input/matrix_fallzahlen_7tage.csv")
+kreise <- read_csv("./input/Kreise-Dtl-2019.csv")
+
+data$datenstand <- ymd(data$datenstand)
+data$tag_nach_meldezeitraum <- ymd(data$tag_nach_meldezeitraum)
+
+data <- data %>% filter(datenstand >= "2021-03-01" & tag_nach_meldezeitraum >= "2021-03-01")
+
+
+```
+
+
+### 7-Tage-Inzidenz berechnen
+
+Maßgeblich für die Analyse ist der Vergleich der Inzidenzwerte der Landkreise -> Berechnung der Werte aus den 7-Tage-Fallzahlen und der Bevölkerungsinformation aus der Kreise-Datei
+
+Formel: 7-Tage-Fallzahl / Einwohnerzahl*100.000
+
+
+```{r}
+ags <- kreise$Ags
+data_inz <- data %>% select(c(datenstand,tag_nach_meldezeitraum)) 
+
+for(i in 1:length(ags)) {
+  
+  col = ags[i]
+  
+  data_new <- data %>% select(c(datenstand,tag_nach_meldezeitraum,col))
+  names(data_new)[3] <- "fallzahl"
+  
+  
+  kreis <- kreise %>% filter(ags == col)
+  pop <- as.numeric(kreis[,8])
+  
+  data_new <- data_new %>% mutate(inz = (fallzahl/pop*100000))%>% select(c(datenstand,tag_nach_meldezeitraum,inz))
+  names(data_new)[3] <- col
+  
+  data_inz <- inner_join(data_inz,data_new, by = c("datenstand"="datenstand","tag_nach_meldezeitraum"="tag_nach_meldezeitraum"))
+  
+}
+
+data_inz <- data_inz %>% mutate_if(is.numeric, function (x) round(x, 1))
+                 
+
+```
+
+
+```{r fig.width=10}
+rki_namen_bl <- kreise %>% select(c("Ags","Rkiname","State") )
+
+data_long <- data_inz %>% pivot_longer(names_to = "Ags", values_to = "Inzidenz", 3:414) %>%
+             mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
+             left_join(rki_namen_bl, by = "Ags")
+
+fun <- list( mean = ~mean(.x, na.rm = TRUE), 
+             med = ~median(.x, na.rm = TRUE), 
+             max = ~max(.x, na.rm = TRUE),
+             quart = ~quantile(.x, probs = 0.75, na.rm = TRUE), 
+             quant_90 = ~quantile(.x, probs = 0.9, na.rm = TRUE), 
+             sd = ~sd(.x, na.rm = TRUE), mad =~mad(.x, na.rm = TRUE))
+```
+
+
+## Zentrale Betrachtung: Systematische Abweichungen
+
+### Erstellen des zenralen Datensatzes: Differenzen zur ursprünglichen Inzidenz nach 1/2/3/5/7/14 Tagen
+
+Der Ausgangsinzidenzwert (datenstand=tag_nach_meldezeitraum) wird für jede Kombination aus Landkreis/Stadt und "tag_nach_meldezeitraum" dem entsprechenden Wert nach den Datenständen einen, zwei, drei, vier, fünf und vierzehn Tage später gegenübergestellt. 
+
+Dadurch ergeben sich Deltas, die wir mit den entsprechenden Tag benennen.Delta_1 ist demnach die Differenz zwischen der Ausgangsinzidenz und der Inzidenz für den entsprechenden Tag, berechnet mit dem Datenstand einen Tag später.
+
+
+
+```{r fig.width=10}
+
+######### Inzidenzen nach 1/2/3/5/7/14 Tagen
+
+data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldezeitraum)  ~ "Inzidenz",
+                                                  (datenstand-tag_nach_meldezeitraum == 1) ~ "nach_1",
+                                                  (datenstand-tag_nach_meldezeitraum == 2) ~ "nach_2",
+                                                  (datenstand-tag_nach_meldezeitraum == 3) ~ "nach_3",
+                                                  (datenstand-tag_nach_meldezeitraum == 5) ~ "nach_5",
+                                                  (datenstand-tag_nach_meldezeitraum == 7) ~ "nach_7",
+                                                  (datenstand-tag_nach_meldezeitraum == 14) ~ "nach_14")) %>%
+                            filter(!is.na(Ind)) %>%
+                            select( -datenstand) %>%
+                            pivot_wider(names_from = Ind, values_from= Inzidenz ) %>%
+                            mutate( delta_1 = nach_1-Inzidenz, delta_2 = nach_2-Inzidenz,
+                                      delta_3 = nach_3-Inzidenz, delta_5 = nach_5-Inzidenz,
+                                     delta_7 = nach_7-Inzidenz,delta_I4=nach_14-Inzidenz) %>%
+                            mutate(Bl = substr(Ags, 1, 2), .after= "Ags")
+
+```
+
+
+
+### Überblick: Wie sieht der Datensatz aus? 
+
+#### Verteilung der Einträge  nach den Ausgangsinzidenzen 
+
+Die meisten Einträge (Landkreis+Tag) haben eine Ausgangsinzidenz um die 100 - das ist der Kernbereich des Datensatzes
+
+```{r}
+data_diff %>% 
+  ggplot() +
+    geom_histogram(mapping = aes(x = Inzidenz), binwidth = 10)+
+  xlab("7-Tage-Inzidenzen") + ylab("Count")
+
+
+```
+
+#### Wie verteilt sich die Höhe der prozentualen Abweichung?
+
+Für diese Auswertung rechnen wie die aboluten Abweichungen, die wir oben mit den Deltas berechnet haben, in Abweichungen prozentual zur Ausgangsinzidenz um, um sie besser vergleichbar zu machen. Exemplarische schauen wir die Abweichung nach einem Tag an.
+
+Wie das Histogram zeigt, finden die meisten Abweichungen nach einem Tag in der Größenordnung 1-5 (binwidth=5) statt. Auch hier gibt es jedoch Ausreiser in hohen Zahlenbereichen. 
+
+Weiter zeigt diese Darstellung gut, dass es auch Fälle gibt, in denen das Delta negativ ausfällt - in denen die Inzidenz also im Nachhinein nach unten korrigiert wurde. Das sind jedoch zum einen sehr wenige Fälle, zum anderen sind die Korrekturen hauptsächlich im niedrigen Zahlenbereich (-5 - -1).
+
+
+```{r}
+
+data_diff %>% 
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  ggplot() +
+    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)+
+  xlab("Prozentuale Abweichung der Inzidenz nach 1 Tag") + ylab("Count") +
+  ggtitle("Verteilung der Einträge (Tag/Landkreis) nach Höhe der Abweichung")
+
+
+```
+
+
+#### Zusammenhang der Höhe der Ausgangsinzidenz mit der Höhe der prozentualen Abweichungen nach einem Tag
+
+Wir antipizieren den Erklärungsversuch, dass hohe Abweichungen vor allem im Bereich hoher Fallzahlen / Inzidenzen auftreten - bedingt etwa durch die Überlastung der Gesundheitsämter. 
+
+Der folgende Plot zeigt, dass dies mit der Darstellung der prozentualen Abweichungen gut abgefangen wird.
+
+Achtung: Die Darstellung wurde aufgrund der Lesbarkeit beschnitten.
+
+```{r}
+
+data_diff %>% 
+  filter(Inzidenz < 305) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  ggplot(aes(x = Inzidenz, y = delta_1)) +
+    geom_boxplot(mapping = aes(group = cut_width(Inzidenz, 10))) +
+    # geom_boxplot(mapping = aes(group = cut_number(Inzidenz, 10))) +
+    stat_summary_bin(
+      geom = "point",
+      binwidth = 10,
+      fun = "mean",
+      col = "black",
+      size = 3,
+      shape = 24,
+      fill = "orange"
+    ) +
+  coord_cartesian(ylim=c(0,20)) +
+  theme(panel.grid.major.x = element_line(colour = "grey"))+
+  xlab("7-Tage-Inzidenzen") + ylab("Prozentuale Abweichung nach einem Tag") +
+  ggtitle("Einträge (Tag/Landkreis) nach Ausgangsinzidenz und Abweichung", subtitle = "x-Achse = 0,350 | y-Achse = 0,20 [Lesbarkeit]")
+
+```
+
+
+In der weiteren Analyse werden wir konsequent die prozentuale Abweichung und den absoluten Wert der Deltas verwenden. Wenn ab diesem Punkt also von Abweichungen gesprochen wird, können diese sowohl im positiven als auch im negativen BEreich passiert sein.
+
+### The Great Overview: Prozentuale Differenzen für den ganzen Datensatz aggregiert
+
+```{r}
+
+data_diff_ges <- data_diff %>% mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), abs)) %>%
+                                mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), 
+                                              function (x) (x/Inzidenz) * 100)) %>%
+                                summarise(across(c(delta_1, delta_2,delta_3, delta_5,delta_7,delta_I4),fun[c(1,2,4,5)]))%>%
+                                pivot_longer(names_to = "Art", values_to = "Inz",1:24) %>%
+                                mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach 1 Tag",
+                                                      (grepl("2",Art)==TRUE)  ~ "nach 2 Tagen",
+                                                      (grepl("3",Art)==TRUE)  ~ "nach 3 Tagen",
+                                                      (grepl("5",Art)==TRUE)  ~ "nach 5 Tagen",
+                                                      (grepl("7",Art,fixed =TRUE)==TRUE )  ~ "nach 7 Tagen",
+                                                      (grepl("I4",Art,fixed =TRUE)==TRUE)  ~ "nach 14 Tagen")) %>%
+                                mutate(groesse = case_when((grepl("mean",Art)==TRUE)  ~ "Mean",
+                                                      (grepl("med",Art)==TRUE)  ~ "Median",
+                                                      (grepl("quart",Art)==TRUE)  ~ "Quartil",
+                                                      (grepl("quant_90",Art)==TRUE)  ~ "Quantil_90"))%>%
+                                mutate(Inz = round(Inz, 1)) %>%
+                                select(-Art) %>%
+                                pivot_wider(names_from = groesse, values_from = Inz)%>%
+                                select(zeitraum, Mean, Median, Quartil, Quantil_90)
+
+data_diff_ges %>% DT::datatable(
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  pageLength = 6,
+                  autoWidth = F))
+
+```
+
+## Genauere Betrachtung der Differenzen
+
+### Nach Bundesländern:
+
+Wir sehen innerhalb der verschiedenen Metriken und Zeiträumen große Unterschiede zwischen den Bundesländern.
+
+Der vollständige, nach Bundesländern aggregierten Datensatz liegt im output-Ordner zur Betrachtung bereit.
+
+Die folgenden Charts zeigen, in welcher Höhe die prozentualen Abweichungen nach n Tagen in den einzelnen Bundesländern liegen - wir stellen einmal das arithmetische Mittel, einmal den Median und einmal das obere Quartil dar.
+
+```{r}
+
+data_diff_bl <- data_diff %>%
+                mutate(across(c(delta_1,delta_2,delta_3, delta_5,delta_7,delta_I4), abs)) %>%
+                mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+                group_by(State) %>%
+                summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[c(1,2,4,5)])) %>%
+                mutate_if(is.numeric, function (x) round(x, 1))
+
+write_csv(data_diff_bl, "./output/Bundesländer.csv")
+
+data_diff_bl %>% 
+  pivot_longer(names_to= "Tage", values_to = "Mean_Delta", c(delta_1_mean,delta_2_mean,delta_3_mean,delta_5_mean,delta_7_mean,
+                               delta_I4_mean)) %>%
+  ggplot(aes(x=Tage,y=Mean_Delta, group=State))+
+  geom_point() +
+  facet_wrap(.~State)+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
+  theme(legend.position = "none")+
+  xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
+  ggtitle("Abweichung der Inzidenzen in den Bundesländern im Durchschnitt (Mean) ")
+
+data_diff_bl %>% 
+  pivot_longer(names_to= "Tage", values_to = "Median_Delta", c(delta_1_med, delta_2_med, delta_3_med, delta_5_med, delta_7_med,
+                               delta_I4_med)) %>%
+  ggplot(aes(x=Tage,y=Median_Delta, group=State))+
+  geom_point() +
+  facet_wrap(.~State)+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
+  theme(legend.position = "none")+
+  xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
+  ggtitle("Abweichung der Inzidenzen in den Bundesländern - Median ")
+
+data_diff_bl %>% 
+  pivot_longer(names_to= "Tage", values_to = "Quartile_Delta", c(delta_1_quart, delta_2_quart, delta_3_quart,
+                                                                 delta_5_quart,delta_7_quart, delta_I4_quart)) %>%
+  ggplot(aes(x=Tage,y=Quartile_Delta, group=State))+
+  geom_point() +
+  facet_wrap(.~State)+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
+  theme(legend.position = "none")+
+   xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
+  ggtitle("Abweichung der Inzidenzen in den Bundesländern - Oberes Quartil (25%)")
+
+
+``` 
+
+ 
+ 
+### Nach Landkreisen:
+
+Auch der Datensatz, in dem wir die prozentualen Abweichungen nach 1,2,3,5,7 und 14 Tagen nach den verschiedenen Metriken für die einzelnen Landkreise aggregieren, liegt im output-Ordner zur Betrachtung bereit. 
+
+Der Plot zeigt .....
+
+```{r}
+
+data_diff_lk <- data_diff %>% 
+  mutate(across(c(delta_1,delta_2,delta_3,delta_5,delta_7, delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  group_by(Ags,Rkiname) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:3])) %>%
+  select(-c("Inzidenz_med","Inzidenz_max")) %>%
+  mutate_if(is.numeric, function (x) round(x, 1))
+ 
+write_csv(data_diff_lk, "./output/Landkreise.csv")
+
+
+```
+
+### Nach Wochentagen
+
+Verteilung der Abweichungen nach Wochentagen entspricht nicht der intuitiven Annahme, dass die Inzidenzen der Wochenenden stärker bereinigt werden müssen. Vermutung: Da es unter der Woche sehr viel mehr Fallmeldungen gibt, als am Wochenende, kommt es hier zu mehr Berichtigungen, da die Gesundheitsämter und Labore stärker ausgelastet sind.
+
+Um diese Vermutung untermauern zu können, lesen wir noch zusätzlich die Daten der täglichen Covid-19-Fälle ein.
+
+ACHTUNG: Wir wollen zeigen, was am Vortag (auf diesen beziehen sich die Fallmeldungen des RKI) in den Gesundheitsämtern los war. Deshalb haben wir die Fälle hier so aggregiert, wie sie am Vortag des entsprechenden Tages beim RKI ankamen. Wir zählen hier also quasi nach Veröffentlichungsdatum. Das RKI hält dieses Datum nicht fest und zeigt Zeitreihen generell nach dem Meldedatum (oder dem Rferenzdatum.)
+
+Im Plot geben wir einen Überblick, wie die Höhe der prozentualen Abweichung sich im Vergleich der einzelnen Wochentage verhält.
+
+In der Tabelle stellen wir die durschnittliche Anzahl Fälle, die beim RKI pro Wochentag ankommen,  den durchscnittlichen prozentualen Abweichungen an den Wochentagen gegenüber.
+
+
+```{r}
+
+data_faelle <- read_csv("./input/matrix_fallzahlen_datenstand.csv")
+data$faelle <- ymd(data$datenstand)
+data_faelle <- data_faelle %>% filter(datenstand >= "2021-03-01")
+
+data_faelle_l <- data_faelle %>% pivot_longer(names_to = "Ags", values_to = "Faelle", 2:413) %>%
+             mutate(weekday = lubridate::wday(datenstand, label=TRUE)) %>%
+             left_join(rki_namen_bl, by = "Ags")
+
+
+data_diff_wd <- data_diff %>%
+  mutate(across(c(delta_1,delta_2,delta_3, delta_5, delta_7,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_5, delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  group_by(weekday)%>% 
+  summarise(across(c(delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1])) %>%
+  mutate(across(2:7, ~round(.x, digits = 1)))
+
+data_diff_wd %>% 
+  pivot_longer(names_to="Tage", values_to="delta_mean", c(delta_1_mean,delta_3_mean,delta_7_mean)) %>%
+  ggplot(aes(x=weekday,y=delta_mean, group=Tage))+
+  geom_point() +
+  facet_grid(Tage~.)+
+  theme(legend.position = "none")+
+   xlab("Wochentage") + ylab("Prozentuale Abweichung zur Ausgangsinzidenz") +
+  ggtitle("Abweichung der Inzidenzen nach 1, 3 und 7 Tagen je Wochentag")
+
+
+data_faelle_wd <- data_faelle_l %>%
+                  group_by(weekday) %>%
+                  summarise(across(Faelle,fun[1])) %>%
+                  mutate(across(2, ~round(.x, digits = 1)))
+  
+
+data_diff_wd_fl <- left_join(data_diff_wd, data_faelle_wd, by ="weekday") %>%
+                    relocate(Faelle_mean,.after = "weekday")
+   
+
+data_diff_wd_fl %>% 
+  DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 7,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
+
+
+```
