@@ -245,18 +245,18 @@ data_diff %>%
 ```{r}
 
 data_diff %>% 
-  #mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>% 
+  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
   ggplot() +
-    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)+
-  ylim(0,750)
+    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)
+    # ylim(0,750)
  
 
 data_diff %>% 
-  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>% 
-   mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   ggplot() +
-    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)+
-  ylim(0,750)
+    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)
+    # ylim(0,500)
 
  
 
@@ -366,7 +366,7 @@ Discard_Keeps %>%
 ```{r}
 
 
-data_diff_bl <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
+data_diff_bl <- data_diff %>% # filter(Datenstand <= 200 & Datenstand >= 50) %>%
                 mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
                 mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
                 group_by(Bl) %>%
@@ -516,7 +516,7 @@ Vermutung: Da es unter der Woche sehr viel mehr Fallmeldungen gibt, als am Woche
 ```{r}
 data_diff_wd <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
-  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
   group_by(weekday) %>%
   summarise(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[c(1,2,4)])) %>%
   mutate(across(2:19, ~round(.x, digits = 1)))
