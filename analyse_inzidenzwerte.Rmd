@@ -53,7 +53,7 @@ Dieser Wert gilt seitdem als Messgröße für regionales Infektionsgeschehen, se
 
 Die Fallmeldungen, de täglich beim RKI eingehen, sind, besonders für die jüngsten Tage, häufig zu niedrig - sie können rückblickend durch Nachmeldungen korrigiert werden. Allerdings sind diese korrigierten Zahlen, aus denen sich auch korrigierte Inzidenzwerte errechnen lassen, nicht maßgeblich für die Corona-Regelungen.
 
-Hier soll gezeigt werden, wie groß die Auwirkungen der Meldeverzögerung rückblickend auf die Inzidenzen ist und welche Konsequenzen das für Grenzwerte haben kann.
+Hier soll gezeigt werden, wie groß die Auswirkungen der Meldeverzögerung rückblickend auf die Inzidenzen ist und welche Konsequenzen das für Grenzwerte haben kann.
 
 ## Über die Daten
 
@@ -104,10 +104,10 @@ for(i in 1:length(ags)) {
   names(data_new)[3] <- "fallzahl"
   
   
-  kreis <- kreise %>% filter(., ags == col)
+  kreis <- kreise %>% filter(ags == col)
   pop <- as.numeric(kreis[,8])
   
-  data_new <- data_new %>% mutate(., inz = (fallzahl/pop*100000))%>% select(c(datenstand,tag_nach_meldezeitraum,inz))
+  data_new <- data_new %>% mutate(inz = (fallzahl/pop*100000))%>% select(c(datenstand,tag_nach_meldezeitraum,inz))
   names(data_new)[3] <- col
   
   data_inz <- inner_join(data_inz,data_new, by = c("datenstand"="datenstand","tag_nach_meldezeitraum"="tag_nach_meldezeitraum"))
@@ -115,6 +115,7 @@ for(i in 1:length(ags)) {
 }
 
 data_inz <- data_inz %>% mutate_if(is.numeric, function (x) round(x, 1))
+                 
 
 
 
@@ -122,16 +123,16 @@ data_inz <- data_inz %>% mutate_if(is.numeric, function (x) round(x, 1))
 
 
 ```{r fig.width=10}
-rki_namen_bl <- kreise %>% select(.,c("Ags","Rkiname","State") )
+rki_namen_bl <- kreise %>% select(c("Ags","Rkiname","State") )
 
 data_long <- data_inz %>% pivot_longer(names_to = "Ags", values_to = "Inzidenz", 3:414) %>%
              mutate(weekday = lubridate::wday(tag_nach_meldezeitraum, label=TRUE)) %>%
-             left_join(., rki_namen_bl, by = "Ags")
+             left_join(rki_namen_bl, by = "Ags")
     
 
 data_faelle_l <- data_faelle %>% pivot_longer(names_to = "Ags", values_to = "Fallzahl", 2:413) %>%
              mutate(weekday = lubridate::wday(datenstand, label=TRUE)) %>%
-             left_join(., rki_namen_bl, by = "Ags")
+             left_join(rki_namen_bl, by = "Ags")
 
 fun <- list( mean = ~mean(.x, na.rm = TRUE), 
              med = ~median(.x, na.rm = TRUE), 
@@ -142,51 +143,54 @@ fun <- list( mean = ~mean(.x, na.rm = TRUE),
 ```
 
 
-### Durchschnittliche Differenz nach n Tagen
+### Differenz zur ursprünglichen Inzidenz nach n Tagen
 
 Der "erste" Inzidenzwert wird für jede Kombination aus Landkreis/Stadt und Meldedatum dem entsprechenden Wert nach den Datenständen einen, zwei, drei, vier, fünf und vierzehn Tage später gegenübergestellt.
 
-#### Abweichung der 7-Tage-Inzidenzen
 
 ```{r fig.width=10}
 
-######### Inzidenzen nach 1/2/3/4/5/14 Tagen
+######### Inzidenzen nach 1/2/3/5/7/14 Tagen
 
-data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldezeitraum)  ~ "Datenstand",
+data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldezeitraum)  ~ "Inzidenz",
                                                   (datenstand-tag_nach_meldezeitraum == 1) ~ "nach_1",
                                                   (datenstand-tag_nach_meldezeitraum == 2) ~ "nach_2",
                                                   (datenstand-tag_nach_meldezeitraum == 3) ~ "nach_3",
-                                                  (datenstand-tag_nach_meldezeitraum == 4) ~ "nach_4",
                                                   (datenstand-tag_nach_meldezeitraum == 5) ~ "nach_5",
+                                                  (datenstand-tag_nach_meldezeitraum == 7) ~ "nach_7",
                                                   (datenstand-tag_nach_meldezeitraum == 14) ~ "nach_14")) %>%
-                            filter(., !is.na(Ind)) %>%
-                            select(., -datenstand) %>%
+                            filter(!is.na(Ind)) %>%
+                            select( -datenstand) %>%
                             pivot_wider(names_from = Ind, values_from= Inzidenz ) %>%
-                            mutate(., delta_1 = nach_1-Datenstand, delta_2 = nach_2-Datenstand,
-                                      delta_3 = nach_3-Datenstand,delta_4 = nach_4-Datenstand,
-                                      delta_5 = nach_5-Datenstand,delta_I4=nach_14-Datenstand) %>%
+                            mutate( delta_1 = nach_1-Inzidenz, delta_2 = nach_2-Inzidenz,
+                                      delta_3 = nach_3-Inzidenz, delta_5 = nach_5-Inzidenz,
+                                     delta_7 = nach_7-Inzidenz,delta_I4=nach_14-Inzidenz) %>%
                             mutate(Bl = substr(Ags, 1, 2), .after= "Ags")
-  
+```
 
-data_diff_ges <- data_diff %>% mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-                                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
-                                summarise(across(c(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4),fun[1:5])) %>%
-                                pivot_longer(names_to = "Art", values_to = "Inz",1:30) %>%
+#### Prozentuale Differenz auf den ganzen Datensatz betrachtet
+
+```{r}
+
+data_diff_ges <- data_diff %>% mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), abs)) %>%
+                                mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), 
+                                              function (x) (x/Inzidenz) * 100)) %>%
+                                summarise(across(c(delta_1, delta_2,delta_3, delta_5,delta_7,delta_I4),fun[c(1,2,4,5)]))%>%
+                                pivot_longer(names_to = "Art", values_to = "Inz",1:24) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach 1 Tag",
                                                       (grepl("2",Art)==TRUE)  ~ "nach 2 Tagen",
                                                       (grepl("3",Art)==TRUE)  ~ "nach 3 Tagen",
-                                                      (grepl("_4",Art,fixed =TRUE)==TRUE )  ~ "nach 4 Tagen",
                                                       (grepl("5",Art)==TRUE)  ~ "nach 5 Tagen",
+                                                      (grepl("7",Art,fixed =TRUE)==TRUE )  ~ "nach 7 Tagen",
                                                       (grepl("I4",Art,fixed =TRUE)==TRUE)  ~ "nach 14 Tagen")) %>%
                                 mutate(groesse = case_when((grepl("mean",Art)==TRUE)  ~ "Mean",
                                                       (grepl("med",Art)==TRUE)  ~ "Median",
-                                                      (grepl("max",Art)==TRUE)  ~ "Max",
                                                       (grepl("quart",Art)==TRUE)  ~ "Quartil",
                                                       (grepl("quant_90",Art)==TRUE)  ~ "Quantil_90"))%>%
                                 mutate(Inz = round(Inz, 1)) %>%
                                 select(-Art) %>%
                                 pivot_wider(names_from = groesse, values_from = Inz)%>%
-                                select(zeitraum, Mean, Median, Quartil, Quantil_90, Max)
+                                select(zeitraum, Mean, Median, Quartil, Quantil_90)
 
 data_diff_ges %>% DT::datatable(
                 rownames = F,
@@ -195,13 +199,6 @@ data_diff_ges %>% DT::datatable(
                   pageLength = 6,
                   autoWidth = F))
 
-#data_diff %>%
-#  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-#  pivot_longer(names_to = "Art",values_to= "Delta", 12:17) %>%
-#  ggplot(aes(x=Art,y=Delta)) +
-#    geom_boxplot(aes(fill=Art), outlier.alpha = 0.5, na.rm = TRUE) +
-#    coord_cartesian(ylim=c(0,20)) +
-#    theme(legend.position = "none")
 ```
 
 
@@ -210,13 +207,9 @@ data_diff_ges %>% DT::datatable(
 ```{r}
 data_diff %>% 
   ggplot() +
-    geom_histogram(mapping = aes(x = Datenstand), binwidth = 10)+
+    geom_histogram(mapping = aes(x = Inzidenz), binwidth = 10)+
   xlab("7-Tage-Inzidenzen") + ylab("Count")
 
-# data_diff %>% 
-#   # filter(Datenstand < 305) %>%
-#   mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>% 
-#   count(cut_width(Datenstand, 10))
 
 ```
 
@@ -225,22 +218,12 @@ data_diff %>%
 ```{r}
 
 data_diff %>% 
-  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-  ggplot() +
-    geom_histogram(mapping = aes(x = delta_1), binwidth = 5)+
-  xlab("Absolute Abweichung der Inzidenz nach 1 Tag") + ylab("Count") +
-  ggtitle("Verteilung der Einträge (Tag/Landkreis) nach Höhe der Abweichung")
- 
-
-data_diff %>% 
-  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  # mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   ggplot() +
     geom_histogram(mapping = aes(x = delta_1), binwidth = 5)+
   xlab("Prozentuale Abweichung der Inzidenz nach 1 Tag") + ylab("Count") +
   ggtitle("Verteilung der Einträge (Tag/Landkreis) nach Höhe der Abweichung")
-
- 
 
 
 ```
@@ -250,12 +233,12 @@ data_diff %>%
 ```{r}
 
 data_diff %>% 
-  filter(Datenstand < 305) %>%
-  #mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
-  ggplot(aes(x = Datenstand, y = delta_1)) +
-    geom_boxplot(mapping = aes(group = cut_width(Datenstand, 10))) +
-    # geom_boxplot(mapping = aes(group = cut_number(Datenstand, 10))) +
+  filter(Inzidenz < 305) %>%
+  #mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  ggplot(aes(x = Inzidenz, y = delta_1)) +
+    geom_boxplot(mapping = aes(group = cut_width(Inzidenz, 10))) +
+    # geom_boxplot(mapping = aes(group = cut_number(Inzidenz, 10))) +
     stat_summary_bin(
       geom = "point",
       binwidth = 10,
@@ -283,10 +266,10 @@ Der obige Boxplot und auch die vorangehenden Recherchen zeigen, dass ein Grund v
 
 ````{r}
 
-data_diff_rel <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
-                                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), abs)) %>%
-                                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
-                                summarise(across(c(delta_1, delta_2,delta_3,delta_4, delta_5,delta_I4),fun[1:5]))%>%
+data_diff_rel <- data_diff %>% filter(Inzidenz <= 200 & Inzidenz >= 50) %>%
+                                mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), abs)) %>%
+                                mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+                                summarise(across(c(delta_1, delta_2,delta_3,delta_7, delta_5,delta_I4),fun[1:5]))%>%
                                 pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
                                                       (grepl("2",Art)==TRUE)  ~ "nach_2",
@@ -322,9 +305,9 @@ Das Filtern entfernt rund 6300 von rund 27.000 Einträgen (Datenstand: 5. Mai 20
 ```{r}
 
 
-Keeps <- data_diff %>% filter(Datenstand <= 200 & Datenstand >= 50) %>%
+Keeps <- data_diff %>% filter(Inzidenz <= 200 & Inzidenz >= 50) %>%
           select(c(tag_nach_meldezeitraum,Bl,State,Ags))
-Discards <- data_diff %>% filter(Datenstand > 200 | Datenstand < 50 ) %>%
+Discards <- data_diff %>% filter(Inzidenz > 200 | Inzidenz < 50 ) %>%
           select(c(tag_nach_meldezeitraum,Bl,State,Ags))
 
 
@@ -363,19 +346,18 @@ Discard_Keeps %>%
 
 
 data_diff_bl <- data_diff %>%
-                mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
-                mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
-                group_by(Bl,State) %>%
-                summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[c(1,2,4,5)])) %>%
+                mutate(across(c(delta_1,delta_2,delta_3, delta_5,delta_7,delta_I4), abs)) %>%
+                mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+                group_by(State) %>%
+                summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[c(1,2,4,5)])) %>%
                 mutate_if(is.numeric, function (x) round(x, 1))
 
 data_diff_bl_table <- data_diff_bl %>%
-                      relocate(Bl,State,Datenstand_mean,delta_1_mean,delta_2_mean,delta_3_mean,delta_4_mean,delta_5_mean,
-                               delta_I4_mean,Datenstand_med, delta_1_med, delta_2_med, delta_3_med, delta_4_med, delta_5_med,
-                               delta_I4_med, Datenstand_quart,delta_1_quart,delta_3_quart,delta_5_quart,
-                               Datenstand_quant_90,delta_1_quant_90,delta_3_quant_90,delta_5_quant_90) %>%
-                      select(1:24) %>%
-                      rename( Inzidenz_mean = Datenstand_mean, Inzidenz_med = Datenstand_med)
+                      relocate(State,Inzidenz_mean,delta_1_mean,delta_2_mean,delta_3_mean, delta_5_mean,delta_7_mean,
+                               delta_I4_mean,Inzidenz_med, delta_1_med, delta_2_med, delta_3_med, delta_5_med,delta_7_med, 
+                               delta_I4_med, Inzidenz_quart,delta_1_quart,delta_3_quart,delta_5_quart,
+                               Inzidenz_quant_90,delta_1_quant_90,delta_3_quant_90,delta_5_quant_90) %>%
+                      select(1:23)
 
 data_diff_bl_table %>%
 DT::datatable(extensions = c("Buttons","FixedColumns"),
@@ -389,34 +371,34 @@ DT::datatable(extensions = c("Buttons","FixedColumns"),
 
 
 data_diff_bl %>% 
-  pivot_longer(names_to= "Tage", values_to = "Mean_Delta", c(delta_1_mean,delta_2_mean,delta_3_mean,delta_4_mean,delta_5_mean,
+  pivot_longer(names_to= "Tage", values_to = "Mean_Delta", c(delta_1_mean,delta_2_mean,delta_3_mean,delta_5_mean,delta_7_mean,
                                delta_I4_mean)) %>%
   ggplot(aes(x=Tage,y=Mean_Delta, group=State))+
   geom_point() +
   facet_wrap(.~State)+
-  scale_x_discrete(labels= c(1,2,3,4,5,14))+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
   theme(legend.position = "none")+
   xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
   ggtitle("Abweichung der Inzidenzen in den Bundesländern im Durchschnitt (Mean) ")
 
 data_diff_bl %>% 
-  pivot_longer(names_to= "Tage", values_to = "Median_Delta", c(delta_1_med, delta_2_med, delta_3_med, delta_4_med, delta_5_med,
+  pivot_longer(names_to= "Tage", values_to = "Median_Delta", c(delta_1_med, delta_2_med, delta_3_med, delta_5_med, delta_7_med,
                                delta_I4_med)) %>%
   ggplot(aes(x=Tage,y=Median_Delta, group=State))+
   geom_point() +
   facet_wrap(.~State)+
-  scale_x_discrete(labels= c(1,2,3,4,5,14))+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
   theme(legend.position = "none")+
   xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
   ggtitle("Abweichung der Inzidenzen in den Bundesländern - Median ")
 
 data_diff_bl %>% 
-  pivot_longer(names_to= "Tage", values_to = "Quartile_Delta", c(delta_1_quart, delta_2_quart, delta_3_quart, delta_4_quart, 
-                                                                 delta_5_quart,delta_I4_quart)) %>%
+  pivot_longer(names_to= "Tage", values_to = "Quartile_Delta", c(delta_1_quart, delta_2_quart, delta_3_quart,
+                                                                 delta_5_quart,delta_7_quart, delta_I4_quart)) %>%
   ggplot(aes(x=Tage,y=Quartile_Delta, group=State))+
   geom_point() +
   facet_wrap(.~State)+
-  scale_x_discrete(labels= c(1,2,3,4,5,14))+
+  scale_x_discrete(labels= c(1,2,3,5,7,14))+
   theme(legend.position = "none")+
    xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
   ggtitle("Abweichung der Inzidenzen in den Bundesländern - Oberes Quartil (25 Prozent der Fälle) ")
@@ -428,16 +410,16 @@ data_diff_bl %>%
  
 #### Nach Landkreisen:
 
-Die Tabelle zeigt pro Landkreis den durchschnittlichen Inzidenzwert (Datenstand_mean) und die gemittelten Abweichungen nach 1,2,3,4,5 und 14 Tagen
+Die Tabelle zeigt pro Landkreis den durchschnittlichen Inzidenzwert (Inzidenz_mean) und die gemittelten Abweichungen nach 1,2,3,4,5 und 14 Tagen
 
 ```{r}
 
 data_diff_lk <- data_diff %>% 
-  mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
-  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  mutate(across(c(delta_1,delta_2,delta_3,delta_5,delta_7, delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(Ags,Rkiname) %>%
-  summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4,delta_5,delta_I4), fun[1:3])) %>%
-  select(-c("Datenstand_med","Datenstand_max"))
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:3])) %>%
+  select(-c("Inzidenz_med","Inzidenz_max"))
 
 data_diff_lk %>% mutate_if(is.numeric, function (x) round(x, 1)) %>%
   DT::datatable(extensions = c("Buttons","FixedColumns"),
@@ -449,25 +431,13 @@ data_diff_lk %>% mutate_if(is.numeric, function (x) round(x, 1)) %>%
                   scrollCollapse = TRUE,
                   autoWidth = T))
 
-
-data_diff_lk %>% 
-  pivot_longer(names_to="Art", values_to="Delta_Med", c(5,11,17)) %>%
-  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
-  geom_point(aes(color=Art)) +
-  facet_grid(Art~.)+
-  xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
-  theme(legend.position = "none") + 
-  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "", "ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) + 
-  theme(panel.grid.major.x = element_line(colour = "grey"))+
-   xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
-  ggtitle("Abweichung der Inzidenzen nach 1,3, und 5 Tagen in den Landkreisen - Median ")
 ```
 
 - Zum Zusammenhang zwischen Höhe des Inzidenzwert und Delta
 
 ```{r}
 data_diff_lk %>%
-  ggplot(aes(x = Datenstand_mean, y = delta_1_mean)) +
+  ggplot(aes(x = Inzidenz_mean, y = delta_1_mean)) +
   geom_point(alpha = 0.4) + 
   geom_smooth(method='lm', formula= y~x) +
   theme(panel.grid.major.x = element_line(colour = "grey"))+
@@ -484,10 +454,10 @@ Wie sehen die durchschnittlichen Abweichungen im zeitlichen Verlauf aus? Gibt es
 ```{r}
 
 data_diff_d <- data_diff %>%
-  mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs))%>%
-  # mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(tag_nach_meldezeitraum) %>%
-  summarise(across(c(Datenstand,delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[1:3])) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:3])) %>%
   ungroup()
 
 data_faelle_d <- data_faelle_l %>% 
@@ -524,10 +494,10 @@ Vermutung: Da es unter der Woche sehr viel mehr Fallmeldungen gibt, als am Woche
 
 ```{r}
 data_diff_wd <- data_diff %>%
-  mutate(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), abs)) %>%
-  mutate(across(c(delta_1, delta_2,delta_3,delta_4,delta_5,delta_I4), function (x) (x/Datenstand) * 100)) %>%
+  mutate(across(c(delta_1,delta_2,delta_3, delta_5, delta_7,delta_I4), abs)) %>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_5, delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(weekday) %>%
-  summarise(across(c(delta_1,delta_2,delta_3,delta_4, delta_5,delta_I4), fun[c(1,2,4)])) %>%
+  summarise(across(c(delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[c(1,2,4)]))%>%
   mutate(across(2:19, ~round(.x, digits = 1)))
 
 data_diff_wd %>% 
@@ -537,7 +507,7 @@ data_diff_wd %>%
   facet_wrap(.~Tage)+
   theme(legend.position = "none")+
    xlab("Wochentage") + ylab("Prozentuale Abweichung") +
-  ggtitle("Abweichung der Inzidenzen nach 1, 3 und 5 Tagen je Wochentag")
+  ggtitle("Abweichung der Inzidenzen nach 1, 3 und 7 Tagen je Wochentag")
 
 
 data_faelle_wd <- data_faelle_l %>%
