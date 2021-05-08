@@ -446,16 +446,30 @@ data_diff_lk %>% mutate_if(is.numeric, function (x) round(x, 1)) %>%
 #           subtitle = "Jeder Punkt stellt einen Landkreis dar")
 
 data_diff_lk %>%
-  pivot_longer(names_to="Art", values_to="Delta_Med", c(8, 14)) %>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", c(8, 16)) %>%
   ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
   geom_point(aes(color=Art), alpha = 0.5) +
   facet_grid(Art~.)+
   xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
   theme(legend.position = "none") +
-  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "    SN", " ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
+  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "   SN", "  ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
   theme(panel.grid.major.x = element_line(colour = "grey"))+
   xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
-  ggtitle("Abweichung der Inzidenzen nach 1,3, und 5 Tagen in den Landkreisen - Median ")
+  # coord_cartesian(ylim=c(0,40)) +
+  ggtitle("Abweichung der Inzidenzen nach 1 und 3 Tagen in den Landkreisen - Median ")
+
+data_diff_lk %>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", c(24, 27)) %>%
+  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+  geom_point(aes(color=Art), alpha = 0.5) +
+  facet_grid(Art~.)+
+  xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "   SN", "  ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
+  theme(panel.grid.major.x = element_line(colour = "grey"))+
+  xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
+  # coord_cartesian(ylim=c(0,40)) +
+  ggtitle("Abweichung der Inzidenzen nach 7 und 14 Tagen in den Landkreisen - Median ")
 ```
 
 

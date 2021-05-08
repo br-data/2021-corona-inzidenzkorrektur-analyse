@@ -234,7 +234,7 @@ Achtung: Die Darstellung wurde aufgrund der Lesbarkeit nach oben und rechts besc
 
 In der weiteren Analyse verwenden wir die relativen Abweichung in Prozentpunkten vom jeweiligen ursprünglich vermeldeten Inzidenzwert. 
 
-### The Great Overview: Prozentuale Differenzen für den ganzen Datensatz aggregiert
+### Deutschlandweit: Prozentuale Abweichungen der 7-Tage-Inzidenzen
 
 ```{r}
 
@@ -262,20 +262,21 @@ data_diff_ges %>% DT::datatable(
                 rownames = F,
                 options = list(
                   dom = "tBp",
+                  buttons = c("csv", "excel"),
                   pageLength = 6,
                   autoWidth = F))
 
 ```
+Beispielsätze
 
-## Genauere Betrachtung der Differenzen
+
+## Detaillierte Betrachtung der Differenzen
 
 ### Nach Bundesländern:
 
 Wir sehen innerhalb der verschiedenen Metriken und Zeiträumen große Unterschiede zwischen den Bundesländern.
 
-Der vollständige, nach Bundesländern aggregierten Datensatz liegt im output-Ordner zur Betrachtung bereit.
-
-Die folgenden Charts zeigen, in welcher Höhe die prozentualen Abweichungen nach n Tagen in den einzelnen Bundesländern liegen - wir stellen einmal das arithmetische Mittel, einmal den Median und einmal das obere Quartil dar.
+Die folgenden Charts zeigen, in welcher Höhe die prozentualen Abweichungen nach x Tagen in den einzelnen Bundesländern liegen - wir stellen einmal das arithmetische Mittel, einmal den Median und einmal das obere Quartil dar.
 
 ```{r}
 
@@ -319,16 +320,16 @@ data_diff_bl %>%
   scale_x_discrete(labels= c(1,2,3,5,7,14))+
   theme(legend.position = "none")+
    xlab("Tage nach Veröffentlichung der Inzidenz") + ylab("Prozentuale Abweichung") +
-  ggtitle("Abweichung der Inzidenzen in den Bundesländern - Oberes Quartil (25%)")
+  ggtitle("Abweichung der Inzidenzen in den Bundesländern - Oberes Quartil (75%)")
 
 
 ``` 
-
+Der vollständige, nach Bundesländern aggregierte Datensatz liegt im output-Ordner als CSV-Datei.
  
  
 ### Nach Landkreisen:
 
-Auch der Datensatz, in dem wir die prozentualen Abweichungen nach 1,2,3,5,7 und 14 Tagen nach den verschiedenen Metriken für die einzelnen Landkreise aggregieren, liegt im output-Ordner zur Betrachtung bereit. 
+
 
 Der Plot zeigt .....
 
@@ -338,14 +339,43 @@ data_diff_lk <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_5,delta_7, delta_I4), abs)) %>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(Ags,Rkiname) %>%
-  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:3])) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:4])) %>%
   select(-c("Inzidenz_med","Inzidenz_max")) %>%
   mutate_if(is.numeric, function (x) round(x, 1))
+
+
+data_diff_lk %>%
+  pivot_longer(names_to="Art", values_to="Delta_Med", c(8, 12, 16)) %>%
+  ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+  geom_point(aes(color=Art), alpha = 0.5) +
+  facet_grid(Art~.)+
+  xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "   SN", "  ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
+  theme(panel.grid.major.x = element_line(colour = "grey"))+
+  xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
+  # coord_cartesian(ylim=c(0,40)) +
+  ggtitle("Abweichung der Inzidenzen nach 1 und 3 Tagen in den Landkreisen - Median ")
+
+# data_diff_lk %>%
+#   pivot_longer(names_to="Art", values_to="Delta_Med", c(20, 24, 28)) %>%
+#   ggplot(aes(x=Ags,y=Delta_Med, group=Art))+
+#   geom_point(aes(color=Art), alpha = 0.5) +
+#   facet_grid(Art~.)+
+#   xlab("Landkreise nach Ags") + ylab("Median_Abweichung") +
+#   theme(legend.position = "none") +
+#   scale_x_discrete(labels = c("SH", "", "NI", "", "NW", "HE", "RP", "BW", "BY", "SL", "", "BB", "MV", "   SN", "  ST", "TH"), breaks = c("01001", "02000", "03101", "04011", "05111", "06411", "07111", "08111", "09161", "10041", "11001", "12051", "13003", "14511", "15001", "16051")) +
+#   theme(panel.grid.major.x = element_line(colour = "grey"))+
+#   xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung des Medians") +
+#   # coord_cartesian(ylim=c(0,40)) +
+#   ggtitle("Abweichung der Inzidenzen nach 1 und 3 Tagen in den Landkreisen - Median ")
  
 write_csv(data_diff_lk, "./output/Landkreise.csv")
 
 
 ```
+
+Auch der Datensatz, in dem wir die prozentualen Abweichungen nach 1,2,3,5,7 und 14 Tagen nach den verschiedenen Metriken für die einzelnen Landkreise aggregieren, liegt im output-Ordner zur Betrachtung bereit. 
 
 ### Nach Wochentagen
 
@@ -379,11 +409,12 @@ data_diff_wd <- data_diff %>%
   mutate(across(2:7, ~round(.x, digits = 1)))
 
 data_diff_wd %>% 
-  pivot_longer(names_to="Tage", values_to="delta_mean", c(delta_1_mean,delta_3_mean,delta_7_mean)) %>%
-  ggplot(aes(x=weekday,y=delta_mean, group=Tage))+
+  pivot_longer(names_to="Tage", values_to="delta_mean", c(delta_1_mean, delta_2_mean, delta_3_mean, delta_5_mean, delta_7_mean, delta_I4_mean)) %>%
+  ggplot(aes(x=weekday,y=delta_mean, group=Tage, color = Tage))+
   geom_point() +
-  facet_grid(Tage~.)+
-  theme(legend.position = "none")+
+  # facet_grid()+
+  # theme(legend.position = "none")+
+  coord_cartesian(ylim=c(0,10)) +
    xlab("Wochentage") + ylab("Prozentuale Abweichung zur Ausgangsinzidenz") +
   ggtitle("Abweichung der Inzidenzen nach 1, 3 und 7 Tagen je Wochentag")
 
@@ -399,14 +430,14 @@ data_diff_wd_fl <- left_join(data_diff_wd, data_faelle_wd, by ="weekday") %>%
    
 
 data_diff_wd_fl %>% 
-  DT::datatable(extensions = c("Buttons","FixedColumns"),
+  DT::datatable(extensions = c("Buttons"),
                 rownames = F,
                 options = list(
                   dom = "tBp",
                   buttons = c("csv", "excel"),
                   pageLength = 7,scrollX = TRUE,
                   scrollCollapse = TRUE,
-                  autoWidth = T))
+                  autoWidth = F))
 
 
 ```
