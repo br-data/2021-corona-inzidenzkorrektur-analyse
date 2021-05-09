@@ -512,6 +512,26 @@ ggplot()+
 
 ```
 
+#### Nach KW:
+```{r}
+data_diff_kw <- data_diff %>%
+  mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  mutate(kw = isoweek(tag_nach_meldezeitraum)) %>%
+  group_by(kw) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:5])) %>%
+  ungroup()
+
+data_diff_kw %>% 
+  ggplot() +
+    geom_point(aes(x=kw,y=delta_1_quart)) +
+    geom_smooth(aes(x=kw,y=delta_1_quart)) +
+    theme(panel.grid.major.x = element_line(colour = "grey")) +
+    expand_limits(y = 0)
+    
+```
+
+
 #### Nach Wochentagen
 
 Verteilung der Abweichungen nach Wochentagen entspricht nicht der intuitiven Annahme, dass die Inzidenzen der Wochenenden stärker bereinigt werden müssen. 
