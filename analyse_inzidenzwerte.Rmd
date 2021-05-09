@@ -268,7 +268,7 @@ Der obige Boxplot und auch die vorangehenden Recherchen zeigen, dass ein Grund v
 
 data_diff_rel <- data_diff %>% filter(Inzidenz <= 200 & Inzidenz >= 50) %>%
                                 mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), abs)) %>%
-                                mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+                                #mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
                                 summarise(across(c(delta_1, delta_2,delta_3,delta_7, delta_5,delta_I4),fun[1:5]))%>%
                                 pivot_longer(names_to= "Art", values_to = "Inz",1:30) %>%
                                 mutate(zeitraum = case_when((grepl("1",Art)==TRUE)  ~ "nach_1",
@@ -616,25 +616,27 @@ data_diff_wd_fl %>%
 ######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
 
 data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "DS", 
-                                                datenstand == (tag_nach_meldezeitraum+1) ~ "DS_1")) %>%
+                                                datenstand == (tag_nach_meldezeitraum+1) ~ "DS_1",
+                                                 datenstand == (tag_nach_meldezeitraum+7) ~ "DS_7" )) %>%
                         filter(., !is.na(Ind)) %>%
                         select(., -datenstand) %>%
-                        pivot_wider(names_from= Ind,values_from= Inzidenz )
+                        pivot_wider(names_from= Ind,values_from= Inzidenz)
 ```
 
 ```{r}
 # Such einen Kreis aus, bsp. Schwabach
 rki_namen <- as_vector(rki_namen_bl[2])
 
-lk = "LK München"
+lk = "LK Aschaffenburg"
 
 # So unterscheiden sich die Inzidenzverläufe nach einem Tag:
 data_vg %>%
   filter(Rkiname %in% lk ) %>%
   ggplot() +
   geom_line(aes(x=tag_nach_meldezeitraum,y=DS_1), color=br24_colours[4]) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS_7), color=br24_colours[3]) +
   geom_line(aes(x=tag_nach_meldezeitraum,y=DS), color=br24_colours[1]) +
-  facet_wrap(Rkiname ~.)+
+  #facet_wrap(Rkiname ~.)+
   scale_x_date(labels = scales::date_format("%d.%m"), breaks = "3 days") +
   scale_y_continuous(breaks = c(50,100,150,200,250,300,350,400,450,500))+
   xlab("Datum") + ylab("Inzidenz") +
@@ -648,28 +650,33 @@ data_vg %>%
 
 ``` {r}
 
-data_konflikte <- data_diff %>%
+data_100 <- data_diff %>%
                   select(c(tag_nach_meldezeitraum,Ags,Rkiname,Inzidenz,nach_1))%>%
-                  mutate(Konf = if_else((Inzidenz < 100 & nach_1 >= 100),1,0) ) %>%
-                  filter(Konf == 1)
+                  mutate(U_100 = if_else((Inzidenz < 100),1,0) ) %>%
+                  filter(tag_nach_meldezeitraum >= "2021-04-23"& U_100 == 1)
 
 
-data_grenze <- data_konflikte %>%
+data_grenzfaelle <- data_100 %>%
                 group_by(Rkiname) %>%
                 arrange(tag_nach_meldezeitraum) %>%
                 mutate(datum.diff = c(1, diff(tag_nach_meldezeitraum))) %>%
                 mutate(periode = cumsum(datum.diff != 1)) %>%
                 ungroup()%>%
                 group_by(Rkiname, periode) %>%
-                summarise(Start = min(tag_nach_meldezeitraum),
+                mutate(Start = min(tag_nach_meldezeitraum),
                           Ende = max(tag_nach_meldezeitraum)) %>%
-                ungroup() %>%
+                ungroup()%>%
                 mutate(Dauer=(Ende-Start)+1)%>%
-                filter(Dauer >= 4)%>%
-                select(-periode)
-        
+                filter(Dauer >= 5)%>%
+                mutate(Konflikte = if_else((Inzidenz < 100 & nach_1 >= 100),1,0) ) %>%
+                filter(Konflikte == 1)%>%
+                group_by(Rkiname,Start,Ende)%>%
+                summarise(across(Konflikte, sum)) %>%
+                ungroup()
 
-data_grenze %>%
+
+
+data_grenzfaelle %>%
         DT::datatable(extensions = c("Buttons","FixedColumns"),
                 rownames = F,
                 options = list(
