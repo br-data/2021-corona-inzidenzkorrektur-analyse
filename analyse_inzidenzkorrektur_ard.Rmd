@@ -367,7 +367,7 @@ write_csv(data_diff_lk, "./output/landkreise_lageparameter.csv")
 
 ### Im Zeitverlauf
 
-Im Zeitverlauf (aggregiert nach Kalenderwochen) zeigt sich, dass das Ausmaß der nachträglichen Korrekturen in den zurückliegenden Kalenderwochen zurückgegangen ist. Die Meldeketten scheinen nicht mehr so überlastet zu sein wie noch in den Wochen zuvor. Trotzdem wurden auch in den vergangenen beiden Wochen die gemeldeten Inzidenzwerte in einem beträchtlichen Teil der Fälle bereits 1 Tag nach Veröffentlichung deutlich korrigiert.
+Im Zeitverlauf (aggregiert nach Kalenderwochen) zeigt sich, dass das Ausmaß der nachträglichen Korrekturen in den zurückliegenden Kalenderwochen in einigen Bundesländern deutlich zurückgegangen ist. Die Meldeketten scheinen nicht mehr so überlastet zu sein/ besser zu funktionieren als noch in den Wochen zuvor. Trotzdem wurden auch in den vergangenen beiden Wochen in den meisten Bundesländern die gemeldeten Inzidenzwerte in einem beträchtlichen Teil der Fälle bereits 1 Tag nach Veröffentlichung deutlich korrigiert.
 
 
 ```{r}
@@ -375,18 +375,19 @@ data_diff_kw <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   mutate(kw = isoweek(tag_nach_meldezeitraum)) %>%
-  group_by(kw) %>%
+  group_by(kw, State) %>%
   summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:5])) %>%
   ungroup()
 
 data_diff_kw %>% 
   ggplot() +
-    geom_line(aes(x=kw,y=delta_1_quart)) +
+    geom_line(aes(x=kw,y=delta_1_quart, group=State)) +
     # geom_smooth(aes(x=kw,y=delta_1_quart)) +
     theme(panel.grid.major.x = element_line(colour = "grey")) +
     expand_limits(y = 0) +
+    facet_wrap(.~State) +
     xlab("Kalenderwoche") + ylab("Prozentuale Abweichung") +
-    ggtitle("Oberes Quartil der Abweichungen der Inzidenzen nach 1 Tag")
+    ggtitle("Oberes Quartil der Abweichungen der Inzidenzen nach 1 Tag im Zeitverlauf")
 ```
 
 
