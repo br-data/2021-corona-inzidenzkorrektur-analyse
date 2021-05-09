@@ -341,8 +341,8 @@ data_diff_lk <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_5,delta_7, delta_I4), abs)) %>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_5,delta_7,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   group_by(Ags,Rkiname) %>%
-  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[1:4])) %>%
-  select(-c("Inzidenz_med","Inzidenz_max")) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_5,delta_7,delta_I4), fun[c(1,2,4,5)])) %>%
+  select(-c("Inzidenz_med")) %>%
   mutate_if(is.numeric, function (x) round(x, 1))
 
 
@@ -357,13 +357,39 @@ data_diff_lk %>%
   theme(panel.grid.major.x = element_line(colour = "grey"))+
   xlab("Landkreise nach Bundesländern") + ylab("Prozentuale Abweichung") +
   # coord_cartesian(ylim=c(0,50)) +
-  ggtitle("Das obere Quartil der Abweichungen der Inzidenzen nach 1, 3 und 5 Tagen")
+  ggtitle("Obere Quartil der Abweichungen der Inzidenzen nach 1, 3 und 5 Tagen")
 
  
 write_csv(data_diff_lk, "./output/landkreise_lageparameter.csv")
 
 
 ```
+
+### Im Zeitverlauf
+
+Im Zeitverlauf (aggregiert nach Kalenderwochen) zeigt sich, dass das Ausmaß der nachträglichen Korrekturen in den zurückliegenden Kalenderwochen zurückgegangen ist. Die Meldeketten scheinen nicht mehr so überlastet zu sein wie noch in den Wochen zuvor. Trotzdem wurden auch in den vergangenen beiden Wochen die gemeldeten Inzidenzwerte in einem beträchtlichen Teil der Fälle bereits 1 Tag nach Veröffentlichung deutlich korrigiert.
+
+
+```{r}
+data_diff_kw <- data_diff %>%
+  mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
+  mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
+  mutate(kw = isoweek(tag_nach_meldezeitraum)) %>%
+  group_by(kw) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:5])) %>%
+  ungroup()
+
+data_diff_kw %>% 
+  ggplot() +
+    geom_line(aes(x=kw,y=delta_1_quart)) +
+    # geom_smooth(aes(x=kw,y=delta_1_quart)) +
+    theme(panel.grid.major.x = element_line(colour = "grey")) +
+    expand_limits(y = 0) +
+    xlab("Kalenderwoche") + ylab("Prozentuale Abweichung") +
+    ggtitle("Oberes Quartil der Abweichungen der Inzidenzen nach 1 Tag")
+```
+
+
 
 ### Nach Wochentagen
 
@@ -380,7 +406,7 @@ data_diff_wd <- data_diff %>%
 
 data_diff_wd %>% 
   pivot_longer(names_to="Tage", values_to="delta_mean", c(delta_1_mean, delta_2_mean, delta_3_mean, delta_5_mean, delta_7_mean, delta_I4_mean)) %>%
-  mutate(Tage = substr(Tage, 1, 8)) %>%
+  # mutate(Tage = substr(Tage, 1, 8)) %>%
   ggplot(aes(x=weekday,y=delta_mean, group=Tage, color = Tage))+
   geom_point() +
   # facet_grid()+

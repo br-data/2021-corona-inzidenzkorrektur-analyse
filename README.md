@@ -1,24 +1,17 @@
-# R Analyse Template
+# Analyse der nachträglichen korrigierten 7-Tage-Inzidenzen
 
-R Template für die Veröffentlichung von Analysen im Design von [BR Data](https://www.br.de/extra/br-data/).
+Hier findet ihr die Analyse zur nachträglichen Korrektur der 7-Tage-Inzidenzwerte. Sie liegt als R-Markdown und als HTML-Version in der Box. Wer sich nicht gerne in R bewegt, kann also direkt auf das HTML-File klicken.
 
-## Verwendung
+## Ordnerstruktur
 
-1. Repository klonen `git clone https://...`
-2. Pandoc installieren, z.B. `brew install pandoc` (Mac)
-3. `analyse.Rmd` in [RStudio](https://rstudio.com/products/rstudio/download/) öffnen und Analyse durchführen
-4. Analyse als HTML-Datei rendern mit `cmd` + `⇧` + `k`
+Im input-Ordner liegen die Dateien, die man benötigt, um die Analyse in R auszuführen. Im output-Ordner, liegen die Ergebnisse der Analyse auf Ebene der Bundesländer und Landkreise in tabellarischer Form. Wer möchte kann die Analyse in R reproduzieren und so auch die output-Dateien neu erzeugen.
 
-## Metadaten
+## Verwendung von RMarkdown
 
-Im obersten Teil der `analyse.Rmd`-Datei befinden sich zwischen zwei mit `---` gekennzeichneten Zeilen die YAML-Metadaten.
-
-Einige Hinweise dazu:
-
-- `description`: Untertitel der Analyse
-- `self_contained: true`: Externe Dateien (z.B. css) werden ins HTML embedded
-- `toc: true`: Inhaltsverzeichnis wird angezeigt
+1. Pandoc installieren, z.B. `brew install pandoc` (Mac)
+2. `analyse.Rmd` in [RStudio](https://rstudio.com/products/rstudio/download/) öffnen und Analyse durchführen
+3. Analyse als HTML-Datei rendern mit `cmd` + `⇧` + `k`
 
 ## Style
 
-Der Style kommt auch vom [BR Data Webpack Longread Template](https://web.br.de/interaktiv/longread-webpack/). Die entsprechende css-Datei `./lib/template/style/style.R` wird über die Metadaten im Header von `analyse.Rmd` eingebunden.
+Wir verwenden für unsere Analysen ein Template. Die entsprechende css-Datei `./lib/template/style/style.R` wird über die Metadaten im Header von `analyse_inzidenzkorrektur.Rmd` eingebunden. Nur dass ihr euch nicht wundert, wenn das an der ein oder anderen Stelle etwas anders aussieht als in plainem R ; )
