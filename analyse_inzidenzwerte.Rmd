@@ -545,7 +545,7 @@ ggplot()+
            =5/10) +
   geom_line(aes(x=kw,y=delta_1_mean*10))+
   #geom_smooth(aes(x=tag_nach_meldezeitraum,y=delta_1_med*10))+
-  scale_y_continuous(name = "Mean Fälle pro Tag/Landkreis", sec.axis = sec_axis(~./10, name = "Abweich. nach 1 Tag)")) +
+  scale_y_continuous(name = "Mean Fälle pro Tag/Landkreis", sec.axis = sec_axis(~./10, name = "Abweich. nach 1 Tag")) +
   xlab("Kalenderwoche") +
   theme(panel.grid.major.x = element_line(colour = "grey"),
         axis.text.x = element_text(angle = 90))
@@ -626,7 +626,7 @@ data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeit
 # Such einen Kreis aus, bsp. Schwabach
 rki_namen <- as_vector(rki_namen_bl[2])
 
-lk = "LK Aschaffenburg"
+lk = "LK München"
 
 # So unterscheiden sich die Inzidenzverläufe nach einem Tag:
 data_vg %>%
@@ -641,5 +641,42 @@ data_vg %>%
   ggtitle(lk, "rot = Inzidenz nach einem Tag, blau = Gültige Inzidenz laut RKI") +
    theme(panel.grid.major.x = element_line(colour = "grey"),
         axis.text.x = element_text(angle = 90))
+
+```
+
+### wann wurden Regelungen fälschlicherweise geändert?
+
+``` {r}
+
+data_konflikte <- data_diff %>%
+                  select(c(tag_nach_meldezeitraum,Ags,Rkiname,Inzidenz,nach_1))%>%
+                  mutate(Konf = if_else((Inzidenz < 100 & nach_1 >= 100),1,0) ) %>%
+                  filter(Konf == 1)
+
+
+data_grenze <- data_konflikte %>%
+                group_by(Rkiname) %>%
+                arrange(tag_nach_meldezeitraum) %>%
+                mutate(datum.diff = c(1, diff(tag_nach_meldezeitraum))) %>%
+                mutate(periode = cumsum(datum.diff != 1)) %>%
+                ungroup()%>%
+                group_by(Rkiname, periode) %>%
+                summarise(Start = min(tag_nach_meldezeitraum),
+                          Ende = max(tag_nach_meldezeitraum)) %>%
+                ungroup() %>%
+                mutate(Dauer=(Ende-Start)+1)%>%
+                filter(Dauer >= 4)%>%
+                select(-periode)
+        
+
+data_grenze %>%
+        DT::datatable(extensions = c("Buttons","FixedColumns"),
+                rownames = F,
+                options = list(
+                  dom = "tBp",
+                  buttons = c("csv", "excel"),
+                  pageLength = 7,scrollX = TRUE,
+                  scrollCollapse = TRUE,
+                  autoWidth = T))
 
 ```
