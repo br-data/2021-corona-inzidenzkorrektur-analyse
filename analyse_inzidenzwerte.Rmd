@@ -513,7 +513,10 @@ ggplot()+
 ```
 
 #### Nach KW:
+
 ```{r}
+
+
 data_diff_kw <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
@@ -521,6 +524,31 @@ data_diff_kw <- data_diff %>%
   group_by(kw) %>%
   summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:5])) %>%
   ungroup()
+
+data_faelle_kw <- data_faelle_l %>%
+                  mutate(kw = isoweek(datenstand)) %>%
+                  #group_by(kw,Ags) %>%
+                  #summarise(across(Fallzahl,sum))%>%
+                  #ungroup()%>%
+                  group_by(kw) %>%
+                  summarise(across(Fallzahl,mean))%>%
+                  set_names("kw","Faelle_Mean")%>%
+                  ungroup()
+
+data_kw_comb <- data_diff_kw %>%
+  select(c("kw","Inzidenz_mean","delta_1_mean","delta_1_med","delta_1_quart","delta_1_quant_90"))%>%
+  left_join(., data_faelle_kw, by= "kw")
+
+data_kw_comb %>%
+ggplot()+
+  geom_col(mapping = aes(x= kw, y= Faelle_Mean), fill= br24_colours[11], alpha
+           =5/10) +
+  geom_line(aes(x=kw,y=delta_1_mean*10))+
+  #geom_smooth(aes(x=tag_nach_meldezeitraum,y=delta_1_med*10))+
+  scale_y_continuous(name = "Mean Fälle pro Tag/Landkreis", sec.axis = sec_axis(~./10, name = "Abweich. nach 1 Tag)")) +
+  xlab("Kalenderwoche") +
+  theme(panel.grid.major.x = element_line(colour = "grey"),
+        axis.text.x = element_text(angle = 90))
 
 data_diff_kw %>% 
   ggplot() +
@@ -576,5 +604,42 @@ data_diff_wd_fl %>%
                   scrollCollapse = TRUE,
                   autoWidth = T))
 
+
+```
+
+#### Einzelne Landkreise
+
+
+
+```{r}
+
+######## Vergleich: Inzidenzen Datenstand vs. Inzidenzen neu (27.04.2021)
+
+data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "DS", 
+                                                datenstand == (tag_nach_meldezeitraum+1) ~ "DS_1")) %>%
+                        filter(., !is.na(Ind)) %>%
+                        select(., -datenstand) %>%
+                        pivot_wider(names_from= Ind,values_from= Inzidenz )
+```
+
+```{r}
+# Such einen Kreis aus, bsp. Schwabach
+rki_namen <- as_vector(rki_namen_bl[2])
+
+lk = "LK Aschaffenburg"
+
+# So unterscheiden sich die Inzidenzverläufe nach einem Tag:
+data_vg %>%
+  filter(Rkiname %in% lk ) %>%
+  ggplot() +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS_1), color=br24_colours[4]) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS), color=br24_colours[1]) +
+  facet_wrap(Rkiname ~.)+
+  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "3 days") +
+  scale_y_continuous(breaks = c(50,100,150,200,250,300,350,400,450,500))+
+  xlab("Datum") + ylab("Inzidenz") +
+  ggtitle(lk, "rot = Inzidenz nach einem Tag, blau = Gültige Inzidenz laut RKI") +
+   theme(panel.grid.major.x = element_line(colour = "grey"),
+        axis.text.x = element_text(angle = 90))
 
 ```
