@@ -380,6 +380,7 @@ data_diff_kw <- data_diff %>%
   ungroup()
 
 data_diff_kw %>% 
+  filter(kw < 19) %>%
   ggplot() +
     geom_line(aes(x=kw,y=delta_1_quart, group=State)) +
     # geom_smooth(aes(x=kw,y=delta_1_quart)) +
