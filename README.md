@@ -1,4 +1,4 @@
-# Analyse der nachträglichen korrigierten 7-Tage-Inzidenzen
+# Analyse der nachträglichen Abweichung 7-Tage-Inzidenzen
 
 Hier findet ihr eine Analyse zur nachträglichen Abweichung der 7-Tage-Inzidenzwerte der deutschen Landkreise. BR Data hat dafür die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) des [Robert Koch-Instituts (RKI)](https://www.rki.de/DE/Home/homepage_node.html;jsessionid=D58CD5F6CA0F096146D5E3E704912261.internet062) für den Zeitraum 01. März 2021 - 11. Mai 2021 analysiert. Die bei der Analyse verwendeten Skripte und Daten befinden sich hier.
 
