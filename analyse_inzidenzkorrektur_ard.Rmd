@@ -53,7 +53,7 @@ Unter Anderem bedingt durch den Aufbau des Meldesystem kann es zu Verzögerungen
 
 Das RKI ergänzt den Datensatz der Covid-19-Fallmeldungen täglich um die neu gemeldeten Fälle. Michael Kreil archiviert für "ARD Data" diesen Datensatz, sodass die Fallzahlen und Inzidenzen für einen bestimmten Tag mit den Datenständen verschiedener Tage betrachtet werden können. Daraus ergeben sich zwei für unsere Analyse zentralen Datumsangaben:
 
-* ```datenstand```: Datenstand beim RKI an, auf den sich die verschiedenen 7-Tage-Inzidenzen beziehen
+* ```datenstand```: Gibt den Datenstand beim RKI an, auf den sich die verschiedenen 7-Tage-Inzidenzen beziehen
 * ```tag_nach_meldezeitraum```: Tag, nach dem Meldezeitraum (7-Tage), in dem registrierte Fälle in die Berechnung der jeweiligen 7-Tageinzidenz eingehen
 
 In der Datei ```matrix_fallzahlen_7tage.csv``` liegen die 7-Tage-Fallzahlen für jede Kombination aus tag_nach_meldezeitraum, datenstand und Landkreis seit dem 1. Januar 2021 aggregiert. Die entsprechende CSV-Datei liegt, ebenso wie eine CSV-Datei mit den Bevölkerungs- und Geodaten der Landkreise im Ordner input.
@@ -62,7 +62,7 @@ In der Datei ```matrix_fallzahlen_7tage.csv``` liegen die 7-Tage-Fallzahlen für
 
 ## Daten einlesen 
 
-Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Analysezeitraum wird gewählt. Wir untersuchen die Entwicklung seit dem 1. März 2021 entschieden – dem Beginn der sogenannten dritten Welle.
+Die beiden vorbereiteten csv-Dateien werden eingelesen. Der Analysezeitraum wird gewählt. Wir untersuchen die Entwicklung seit dem 1. März 2021 – dem Beginn der sogenannten dritten Welle.
 
 ```{r}
 
@@ -132,7 +132,7 @@ fun <- list( mean = ~mean(.x, na.rm = TRUE),
 
 Der Ausgangsinzidenzwert (```datenstand == tag_nach_meldezeitraum```) wird für jede Kombination aus Landkreis und tag_nach_meldezeitraum dem entsprechenden Wert laut Datenständen einen, zwei, drei, fünf, sieben und vierzehn Tage später gegenübergestellt. 
 
-Dadurch ergeben sich Abweichungen (```delta```), die wir mit der Zahl der vergangenen Tage benennen. delta_1 ist demnach die Differenz zwischen der Ausgangsinzidenz und der Inzidenz für den jweiligen Tag, berechnet mit dem Datenstand 1 Tag später, delta 2 ist die Differenz zwischen der Ausgangsinzidenz und der Inzidenz für den jweiligen Tag, berechnet mit dem Datenstand 2 Tage später, etc.
+Dadurch ergeben sich Abweichungen (```delta```), die wir mit der Zahl der vergangenen Tage benennen. delta_1 ist demnach die Differenz zwischen der Ausgangsinzidenz und der Inzidenz für den jeweiligen Tag, berechnet mit dem Datenstand 1 Tag später, delta 2 ist die Differenz zwischen der Ausgangsinzidenz und der Inzidenz für den jeweiligen Tag, berechnet mit dem Datenstand 2 Tage später, etc.
 
 
 
@@ -160,9 +160,9 @@ data_diff <- data_long %>% mutate(Ind = case_when((datenstand == tag_nach_meldez
 
 # Annäherung an den Datensatz
 
-#### Verteilung der Einträge nach den Ausgangsinzidenzen 
+## Verteilung der Einträge nach den Ausgangsinzidenzen 
 
-Großteil der vermeldeten Inzidenzen (Landkreis x Tag) liebt im Bereich zwischen 50 und 200, das ist der Kernbereich des Datensatzes.
+Großteil der vermeldeten Inzidenzen (Landkreis x Tag) liegt im Bereich zwischen 50 und 200, das ist der Kernbereich des Datensatzes.
 
 ```{r}
 data_diff %>% 
@@ -173,9 +173,9 @@ data_diff %>%
 
 ```
 
-#### Wie verteilt sich die Höhe der prozentualen Abweichung?
+## Wie verteilt sich die Höhe der prozentualen Abweichung?
 
-Für die Auswertung rechnen wie die Abweichungen, die wir oben mit den Deltas berechnet haben, in Abweichungen prozentual zur Ausgangsinzidenz um, um sie an die Größenordnung der Ausgangsinzidenz anzupassen und damit besser vergleichbar zu machen. Exemplarisch schauen wir uns die prozentualen Abweichungen nach einem Tag an.
+Für die Auswertung rechnen wir die Abweichungen, die wir oben mit den Deltas berechnet haben, in Abweichungen prozentual zur Ausgangsinzidenz um, um sie an die Größenordnung der Ausgangsinzidenz anzupassen und damit besser vergleichbar zu machen. Exemplarisch schauen wir uns die prozentualen Abweichungen nach einem Tag an.
 
 ```{r}
 data_diff %>% 
@@ -190,12 +190,14 @@ data_diff %>%
 
 Wie das Histogram zeigt, liegen die meisten Abweichungen nach einem Tag in einer Größenordnung von 1 bis 5 Prozentpunkten.  Genauso gibt es aber einen relevanten Teil der Fälle, in denen es zu Korrekturen um 5 oder teilweise deutlich mehr Prozentpunkte kommt. 
 
-Weiter zeigt die Darstellung, dass es auch Fälle gibt, in denen das Delta negativ ausfällt, in denen die Inzidenz also im Nachhinein nach unten korrigiert wurde. Das sind jedoch nur sehr wenige Fälle im meist niedrigen Zahlenbereich. Da aber auch diese Fälle eine Korrektur darstellen und wir in der Auswertung Abweichungen vom ursprünglich vermeldenten Wert untersuchen wollen, gehen sie (vorzeichen-bereinigt) ebenfalls in die Auswertung ein. *Wenn wir im Folgenden von Abweichungen sprechen, können diese (wenn auch nur in sehr wenigen Fällen) auch eine nachträgliche Korrektur nach unten beinhalten.*
+Weiter zeigt die Darstellung, dass es auch Fälle gibt, in denen das Delta negativ ausfällt, in denen die Inzidenz also im Nachhinein nach unten korrigiert wurde. Das sind jedoch nur sehr wenige Fälle im meist niedrigen Zahlenbereich. Da aber auch diese Fälle eine Korrektur darstellen und wir in der Auswertung Abweichungen vom ursprünglich vermeldeten Wert untersuchen wollen, gehen sie (vorzeichen-bereinigt) ebenfalls in die Auswertung ein. 
+
+*Wenn wir im Folgenden von Abweichungen sprechen, können diese (wenn auch nur in sehr wenigen Fällen) auch eine nachträgliche Korrektur nach unten beinhalten.*
 
 
-#### Zusammenhang der Höhe der Ausgangsinzidenz mit den relativen Abweichungen nach einem Tag
+## Zusammenhang der Höhe der Ausgangsinzidenz mit den relativen Abweichungen nach einem Tag
 
-Wir antipizieren den Erklärungsansatz, hohe Abweichungen wären in Erster Linie daran zu beobachten, wenn hohe Inzidenzen gemeldet werden - bedingt etwa durch eine dann tendenziell höhere Belastung der Gesundheitsämter. Der folgende Plot zeigt, dass dieser Zusammenhang mit der Wahl der prozentualen Abweichung als Metrik so nicht in den Daten steckt. Es ist eher so, dass die relative Betrachtung der Abweichungen eher bei niedigeren Ausgangsinzidenzen etwas höher ausfällt.  
+Wir antizipieren den Erklärungsansatz, hohe Abweichungen wären in erster Linie dann zu beobachten, wenn hohe Inzidenzen gemeldet werden - bedingt etwa durch eine dann tendenziell höhere Belastung der Gesundheitsämter. Der folgende Plot zeigt, dass dieser Zusammenhang mit der Wahl der prozentualen Abweichung als Metrik so nicht in den Daten steckt. Es ist eher so, dass die relative Betrachtung der Abweichungen eher bei niedigeren Ausgangsinzidenzen etwas höher ausfällt.  
 
 
 ```{r}
@@ -225,21 +227,19 @@ data_diff %>%
 
 Achtung: Die Darstellung wurde aufgrund der Lesbarkeit nach oben und rechts beschnitten. Bei den orangen Dreiecken handelt sich um das arithmetische Mittel der Fälle im jeweiligen Bin.
 
-*In der weiteren Analyse verwenden wir die relativen Abweichung in Prozentpunkten vom jeweiligen ursprünglich vermeldeten Inzidenzwert.*
+*In der weiteren Analyse verwenden wir die relative Abweichung in Prozentpunkten vom jeweiligen ursprünglich vermeldeten Inzidenzwert. Um zusätzlich die Auswertungen auch nach der absoluten Abweichung durchführen zu können, muss folgende Zeile im Code auskommentiert werden: "mutate(across(c(.......), function (x) (x/Inzidenz) . 100))" *
 
 
 # Deutschlandweite Auswertung
 
-## Zentrale Kennzahlen
-
-#### Kernaussagen:
+## Kernaussagen:
 
 * Bereits am ersten Tag nach Veröffentlichung werden die vermeldeten 7-Tage-Inzidenzwerte in den Landkreisen erheblich korrigiert, nämlich im Durchschnitt um ca. 5 Prozent des ursprünglich gemeldeten Inzidenzwerts.
-* Problematisch ist, dass die auftetenden Korrekturen sehr unterschiedlich ausfallen. Im Großteil der Fälle ändern sich die gemeldeten Inzidenzwerte im Nachhinein nur wenig. In einem Viertel der Fälle wird der gemeldete Inzidenzwert  bereits am ersten Tag nach Veröffentlichung um 7 Prozent oder mehr korrigiert, in jedem zehnten Fall sogar um 15 Prozentpunkte oder mehr.  
-* In den Folgetage kommt es zu weiteren Anpassungen der Inzidenzwerte. Die Veränderungen zum jeweiligen ursprüngich gemeldeten Wert zeigen, dass der Großteil der für den jeweiligen Zeitraum relevanten Nachmeldungen bereist am ersten Tag nach Veröffentlichung der 7-Tage-Inzidenz beim RKI ankommen.
+* Problematisch ist, dass die auftretenden Korrekturen sehr unterschiedlich ausfallen. Im Großteil der Fälle ändern sich die gemeldeten Inzidenzwerte im Nachhinein nur wenig. In einem Viertel der Fälle wird der gemeldete Inzidenzwert  bereits am ersten Tag nach Veröffentlichung um 8 Prozent oder mehr korrigiert, in jedem zehnten Fall sogar um 16 Prozentpunkte oder mehr.  
+* In den Folgetagen kommt es zu weiteren Anpassungen der Inzidenzwerte. Die Veränderungen zum jeweiligen ursprünglich gemeldeten Wert zeigen, dass der Großteil der für den jeweiligen Zeitraum relevanten Nachmeldungen bereist am ersten Tag nach Veröffentlichung der 7-Tage-Inzidenz beim RKI ankommt.
 
 
-#### Abweichungen der 7-Tage-Inzidenz nach x Tagen
+## Abweichungen der 7-Tage-Inzidenz nach x Tagen
 
 ```{r}
 
@@ -276,7 +276,7 @@ data_diff_ges %>% DT::datatable(
 
 # Detaillierte Betrachtungen
 
-### Nach Bundesländern:
+## nach Bundesländern:
 
 Zwischen den Bundesländern lassen sich große Unterschiede beobachten. Die folgenden Plots zeigen, in welcher Größenordnung die Abweichungen der 7-Tage-Inzidenzen nach x Tagen in den einzelnen Bundesländern liegen. Wir stellen das arithmetische Mittel, den Median und das obere Quartil dar. Die berechneten Metriken (arithmetisches Mittel, Median, oberes Quartil, 90-Prozent-Quantil) nach x Tagen (1, 2, 3, 5, 7 und 14 Tage) findet ihr im output-Ordner unter ```bundeslaender_lageparameter.csv```.
 
@@ -329,7 +329,7 @@ data_diff_bl %>%
 
  
  
-### Nach Landkreisen:
+## nach Landkreisen:
 
 Die größten Unterschiede lassen sich offensichtlich zwischen den einzelnen Landkreisen feststellen. Es gibt Landkreise, in denen die vom RKI gemeldeten Inzidenzwerte besonders stark und besonders häufig korrigiert werden, und andere in denen das kaum bzw. in nur sehr geringem Ausmaß passiert.
 
@@ -365,7 +365,7 @@ write_csv(data_diff_lk, "./output/landkreise_lageparameter.csv")
 
 ```
 
-### Im Zeitverlauf
+## im Zeitverlauf
 
 Im Zeitverlauf (aggregiert nach Kalenderwochen) zeigt sich, dass das Ausmaß der nachträglichen Korrekturen in den zurückliegenden Kalenderwochen in einigen Bundesländern deutlich zurückgegangen ist. Die Meldeketten scheinen nicht mehr so überlastet zu sein/ besser zu funktionieren als noch in den Wochen zuvor. Trotzdem wurden auch in den vergangenen beiden Wochen in den meisten Bundesländern die gemeldeten Inzidenzwerte in einem beträchtlichen Teil der Fälle bereits 1 Tag nach Veröffentlichung deutlich korrigiert.
 
@@ -393,7 +393,7 @@ data_diff_kw %>%
 
 
 
-### Nach Wochentagen
+## nach Wochentagen
 
 Aggregiert man die Abweichungen nach Wochentagen, zeigt sich, dass es auch hier erhebliche Unterschiede gibt. Im Plot sieht man, wie hoch die durchschnittliche, relative Abweichung pro Wochentag in Prozentpunkten ist. 
 
@@ -418,6 +418,83 @@ data_diff_wd %>%
   ggtitle("Mittlere Abweichung der Inzidenzen nach x Tagen im Wochenverlauf")
 ```
 
+#Bereitstellung der Daten für weitere Grafiken:
+
+## Inzidenzverlauf von einzelnen Landkreisen:
+
+```{r}
+#Landkreis auswählen, Datensatz vorbereiten
+
+lk = "SK München"
+
+data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeitraum  ~ "DS", 
+                                                datenstand == (tag_nach_meldezeitraum+1) ~ "DS_1",
+                                                 datenstand == (tag_nach_meldezeitraum+7) ~ "DS_7" )) %>%
+                        filter(., !is.na(Ind)) %>%
+                        select(., -datenstand) %>%
+                        pivot_wider(names_from= Ind,values_from= Inzidenz)%>%
+                        filter(Rkiname == lk)
+
+
+write_excel_csv(data_vg, paste("./",lk,".xls", sep =""))
+
+
+# So unterscheiden sich die Inzidenzverläufe im ausgewählten Landkreis:
+
+data_vg %>%
+  ggplot() +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS_1), color=br24_colours[4]) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS_7), color=br24_colours[5]) +
+  geom_line(aes(x=tag_nach_meldezeitraum,y=DS), color=br24_colours[1]) +
+  #facet_wrap(Rkiname ~.)+
+  scale_x_date(labels = scales::date_format("%d.%m"), breaks = "3 days") +
+  scale_y_continuous(breaks = c(50,100,150,200,250,300,350,400,450,500))+
+  xlab("Datum") + ylab("Inzidenz") +
+  ggtitle(lk, "blau = Gültige Inzidenz laut RKI, rot = Inzidenz nach einem Tag, gelb = Inzidenz nach 7 Tagen") +
+   theme(panel.grid.major.x = element_line(colour = "grey"),
+        axis.text.x = element_text(angle = 90))
 
 
 
+```
+
+## Deutschlandkarte: Durchschnittliche Abweichung der Inzidenz nach einem Tag
+
+```{r}
+
+data_diff_karte <- data_diff %>% 
+  select(tag_nach_meldezeitraum, Ags,Rkiname,Inzidenz,delta_1)%>%
+  mutate(across(c(delta_1), abs)) %>%
+  mutate(delta_1_p = (delta_1/Inzidenz) * 100)%>%
+  group_by(Ags,Rkiname) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_1_p), mean,na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(across(3:5, ~round(.x, digits = 1)))%>%
+  left_join(., (kreise[,c("Ags","Lat","Long")]),by="Ags")
+
+write_excel_csv(data_diff_karte,"./Deutschlandkarte.xls")
+
+
+```
+
+## Bundeslandkarte: Durchschnittliche Abweichung der Inzidenz nach einem Tag
+
+```{r}
+
+Bl = "Bayern"
+
+data_diff_Bl_karte <- data_diff %>% 
+  select(tag_nach_meldezeitraum, Ags, State,Rkiname,Inzidenz,delta_1)%>%
+  filter(State == Bl) %>%
+  mutate(across(c(delta_1), abs)) %>%
+  mutate(delta_1_p = (delta_1/Inzidenz) * 100)%>%
+  group_by(Ags,Rkiname) %>%
+  summarise(across(c(Inzidenz,delta_1,delta_1_p), mean,na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(across(3:5, ~round(.x, digits = 1)))%>%
+  left_join(., (kreise[,c("Ags","Lat","Long")]),by="Ags")
+
+write_excel_csv(data_diff_karte,"./Bundeslandkarte.xls")
+
+
+```
