@@ -380,7 +380,6 @@ data_diff_kw <- data_diff %>%
   ungroup()
 
 data_diff_kw %>% 
-  filter(kw < 19) %>%
   ggplot() +
     geom_line(aes(x=kw,y=delta_1_quart, group=State)) +
     # geom_smooth(aes(x=kw,y=delta_1_quart)) +
@@ -436,7 +435,7 @@ data_vg <- data_long %>% mutate(Ind = case_when(datenstand == tag_nach_meldezeit
                         filter(Rkiname == lk)
 
 
-write_excel_csv(data_vg, paste("./",lk,".xls", sep =""))
+write_csv(data_vg, paste("./output/",lk,".csv", sep =""))
 
 
 # So unterscheiden sich die Inzidenzverläufe im ausgewählten Landkreis:
@@ -472,7 +471,7 @@ data_diff_karte <- data_diff %>%
   mutate(across(3:5, ~round(.x, digits = 1)))%>%
   left_join(., (kreise[,c("Ags","Lat","Long")]),by="Ags")
 
-write_excel_csv(data_diff_karte,"./Deutschlandkarte.xls")
+write_csv(data_diff_karte,"./output/Deutschlandkarte.csv")
 
 
 ```
@@ -494,7 +493,7 @@ data_diff_Bl_karte <- data_diff %>%
   mutate(across(3:5, ~round(.x, digits = 1)))%>%
   left_join(., (kreise[,c("Ags","Lat","Long")]),by="Ags")
 
-write_excel_csv(data_diff_karte,"./Bundeslandkarte.xls")
+write_csv(data_vg, paste("./output/",Bl,".csv", sep =""))
 
 
 ```
