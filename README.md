@@ -1,6 +1,6 @@
 # Analyse der nachträglichen korrigierten 7-Tage-Inzidenzen
 
-Hier findet ihr eine Analyse zur nachträglichen Abweichung der 7-Tage-Inzidenzwerte der deutschen Landkreisen. BR Data hat dafür die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) des [Robert Koch-Instituts (RKI)](https://www.rki.de/DE/Home/homepage_node.html;jsessionid=D58CD5F6CA0F096146D5E3E704912261.internet062) für den Zeitraum 01. März 2021 - 11. Mai 2021 analysiert. Die bei der Analyse verwendeten Skripte und Daten befinden sich hier.
+Hier findet ihr eine Analyse zur nachträglichen Abweichung der 7-Tage-Inzidenzwerte der deutschen Landkreise. BR Data hat dafür die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) des [Robert Koch-Instituts (RKI)](https://www.rki.de/DE/Home/homepage_node.html;jsessionid=D58CD5F6CA0F096146D5E3E704912261.internet062) für den Zeitraum 01. März 2021 - 11. Mai 2021 analysiert. Die bei der Analyse verwendeten Skripte und Daten befinden sich hier.
 
 Links zum Projekt:
 - [Corona-Lockerungen: Fehlende Meldungen verzerren Inzidenzen (br.de)](https://www.br.de/nachrichten/bayern/corona-lockerungen-inzidenzen-verzerrt-wegen-fehlender-meldungen,SX8NMAb)
@@ -12,11 +12,11 @@ Das RKI stellt die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis
 
 Aus diesem Grund archiviert Michael Kreil für [ARD Data](https://github.com/ard-data/2020-rki-archive) täglich den vollständigen Datensatz, sodass die Fallzahlen und Inzidenzen für einen bestimmten Tag mit den Datenständen verschiedener Tage betrachtet werden können.
 
-In einem ersten Schritt werden die Daten dieses Archivs über .....
+In einem ersten Schritt werden die Rohdaten aus dem Archiv über .....
 
 ....... How to best run Michaels Script
 
-Anschließend werden die Daten in R ausgewertet. Die Analyse liegt als R-Markdown und als HTML-Version in der Box. Wer sich nicht gerne in R bewegt, kann also direkt auf das HTML-File klicken.
+Anschließend werden diese Daten in R ausgewertet. Die Analyse liegt als R-Markdown und als HTML-Version in der Box. Wer sich nicht gerne in R bewegt, kann also direkt auf das HTML-File klicken. Die Analyseschritte werden erläutert, die Ergebnisse kurz zusammengefasst und mit visuellen Elementen wie Tabellen und Grafiken veranschaulicht. 
 
 ## Ordnerstruktur
 
