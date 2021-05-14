@@ -35,6 +35,6 @@ Wir verwenden für unsere Analysen ein Template. Die entsprechende css-Datei `./
 ## Weitere ARD-Ausspielungen
 Die vorliegende Analyse wurde von mehreren Datenteams innerhalb der ARD genutzt, um Veröffentlichungen zu den abweichenden Inzidenzwerten aufzusetzen bzw. zu ergänzen. 
 Einige Beispiele:
--[Meldeverzug kann verhindern, dass die "Notbremse" greift (NDR)](https://www.ndr.de/nachrichten/info/Corona-Zahlen-Meldeverzug-kann-verhindern-dass-Notbremse-greift,inzidenzkorrektur100.html)
--[Warum die Notbremse nicht alle gleich behandelt(RBB)](https://www.rbb24.de/panorama/thema/corona/beitraege/2021/05/rki-inzidenz-verzerrt-meldeverzug-notbremse.html)
+- [Meldeverzug kann verhindern, dass die "Notbremse" greift (NDR)](https://www.ndr.de/nachrichten/info/Corona-Zahlen-Meldeverzug-kann-verhindern-dass-Notbremse-greift,inzidenzkorrektur100.html)
+- [Warum die Notbremse nicht alle gleich behandelt(RBB)](https://www.rbb24.de/panorama/thema/corona/beitraege/2021/05/rki-inzidenz-verzerrt-meldeverzug-notbremse.html)
 
