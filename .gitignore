@@ -18,7 +18,6 @@ Icon
 
 ### Project ###
 #analyse.html
-*.html
 analyse_files/
 .Rproj.user
 
