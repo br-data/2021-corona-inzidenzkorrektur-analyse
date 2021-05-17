@@ -1,36 +1,52 @@
-# Analyse der nachträglichen Abweichung der 7-Tage-Inzidenzen
+# Analyse der nachträglichen Abweichungen der 7-Tage-Inzidenz der Landkreise
 
-Hier findet ihr eine Analyse zur nachträglichen Abweichung der 7-Tage-Inzidenzwerte der deutschen Landkreise. BR Data hat dafür die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) des [Robert Koch-Instituts (RKI)](https://www.rki.de/DE/Home/homepage_node.html;jsessionid=D58CD5F6CA0F096146D5E3E704912261.internet062) für den Zeitraum 01. März 2021 - 11. Mai 2021 analysiert. Die bei der Analyse verwendeten Skripte und Daten befinden sich hier.
+Hier findet ihr eine Analyse zu den nachträglichen Abweichungen der 7-Tage-Inzidenzwerte der deutschen Landkreise. BR Data hat dafür die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) des [Robert Koch-Instituts (RKI)](https://www.rki.de/DE/Home/homepage_node.html;jsessionid=D58CD5F6CA0F096146D5E3E704912261.internet062) für den Zeitraum 01. März 2021 - 11. Mai 2021 analysiert. Die bei der Analyse verwendeten Skripte und Daten finden sich hier.
 
 Links zum Projekt:
 - [Corona-Lockerungen: Fehlende Meldungen verzerren Inzidenzen (br.de)](https://www.br.de/nachrichten/bayern/corona-lockerungen-inzidenzen-verzerrt-wegen-fehlender-meldungen,SX8NMAb)
 - [Inzidenz zu niedrig - Lockerung zu früh? (tagesschau.de)](https://www.tagesschau.de/investigativ/br-recherche/inzidenz-daten-101.html)
 
+
 ## Überblick zum Vorgehen
 
-Das RKI stellt die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) seit Beginn der Pandemie zur Verfügung. Diese Daten werden täglich mit den neuesten Fallmeldungen (darunter auch Nachmeldungen) ergänzt. Der Datenstand eines bestimmten Tages wird nicht festgehalten.
+Das RKI stellt die [Covid-19-Falldaten](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0) seit Beginn der Pandemie zur Verfügung. Diese Daten werden täglich mit den neuesten Fallmeldungen (darunter auch Nachmeldungen) ergänzt.
 
-Aus diesem Grund archiviert Michael Kreil für [ARD Data](https://github.com/ard-data/2020-rki-archive) täglich den vollständigen Datensatz, sodass die Fallzahlen und Inzidenzen für einen bestimmten Tag mit den Datenständen verschiedener Tage betrachtet werden können.
+Wir (cc Michael Kreil) archivieren für [ARD Data](https://github.com/ard-data/2020-rki-archive) täglich den vollständigen Datensatz. Aus diesen Daten lassen sich Fallzahlen nach Meldedatum und Inzidenzewerte für die Landkreise berechnen. Die so berechneten Inzidenzwerte nach unterschiedlichen Datenständen bilden die Grundlage der Auswertung.
 
-In einem ersten Schritt werden die Rohdaten aus dem Archiv über .....
+Die Analyse liegt als R-Markdown und als HTML-Version vor. Die Analyseschritte werden erläutert, die Ergebnisse kurz zusammengefasst und mit visuellen Elementen wie Tabellen und Grafiken veranschaulicht. 
 
-....... How to best run Michaels Script
 
-Anschließend werden diese Daten in R ausgewertet. Die Analyse liegt als R-Markdown und als HTML-Version in der Box. Wer sich nicht gerne in R bewegt, kann also direkt auf das HTML-File klicken. Die Analyseschritte werden erläutert, die Ergebnisse kurz zusammengefasst und mit visuellen Elementen wie Tabellen und Grafiken veranschaulicht. 
+## Verwendung 
+
+Input-Dateien (mit aktuellem Stand) erzeugen: [optional]
+
+1. Rohdaten aus ARD Data-Repository herunterladen: `node lib/0_download_data.js`
+2. Matrix mit kumulierten 7-Tage-Fallzahlen generieren:`node lib/1_create_inzidenz_matrix.js` 
+3. Matrix mit Fallzahlen nach Berichtsdatum erstellen: `node lib/2_create_datenstand_matrix.js`
+
+Analyse ausführen:
+* `analyse.Rmd` in [RStudio](https://rstudio.com/products/rstudio/download/) öffnen und Analyse durchführen
+* Analyse als HTML-Datei rendern mit cmd + ⇧ + k
+
+Sanity check: [optional]
+* `checks-and-balances.R` vergleicht die Werte, die aus Aggregation der [archivierten RKI-Daten](https://github.com/ard-data/2020-rki-archive) und der [a-posteriori Veröffentlichung](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.html) durch das RKI resultieren
+
+## Abhängigkeiten
+
+* [Node.js](https://nodejs.org/en/)
+* [Pandoc](https://pandoc.org/)
+* [R](https://www.r-project.org/) (Markdown)
+
 
 ## Ordnerstruktur
 
-Im input-Ordner liegen die Dateien, die man benötigt, um die Analyse in R auszuführen. Im output-Ordner liegen die Ergebnisse der Analyse auf Ebene der Bundesländer und Landkreise in tabellarischer Form. Wer möchte kann die Analyse in R reproduzieren und so auch die output-Dateien neu erzeugen.
+Im input-Ordner liegen die Dateien, die man benötigt, um die Analyse in R auszuführen. Im lib-Ordner liegen die Skripte, die die input-Dateien aus dem [ARD Data-Repository](https://github.com/ard-data/2020-rki-archive) erzeugen. Im output-Ordner liegen die Ergebnisse der Analyse auf Ebene der Bundesländer und Landkreise in tabellarischer Form.
 
-## Verwendung von RMarkdown
-
-1. Pandoc installieren, z.B. `brew install pandoc` (Mac)
-2. `analyse.Rmd` in [RStudio](https://rstudio.com/products/rstudio/download/) öffnen und Analyse durchführen
-3. Analyse als HTML-Datei rendern mit `cmd` + `⇧` + `k`
 
 ## Style
 
-Wir verwenden für unsere Analysen ein Template. Die entsprechende css-Datei `./lib/template/style/style.R` wird über die Metadaten im Header von `analyse_inzidenzkorrektur.Rmd` eingebunden. Nur dass ihr euch nicht wundert, wenn das an der ein oder anderen Stelle etwas anders aussieht als in plainem R ; )
+Wir verwenden für unsere Analysen ein Template. Die entsprechende css-Datei `./lib/template/style/style.R` wird über die Metadaten im Header von `analyse_inzidenzkorrektur.Rmd` eingebunden.
+
 
 ## Weitere ARD-Ausspielungen
 Die vorliegende Analyse wurde von mehreren Datenteams innerhalb der ARD genutzt, um Veröffentlichungen zu den abweichenden Inzidenzwerten aufzusetzen bzw. zu ergänzen. 
