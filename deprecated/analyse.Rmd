@@ -521,6 +521,7 @@ data_diff_kw <- data_diff %>%
   mutate(across(c(delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), abs))%>%
   mutate(across(c(delta_1, delta_2,delta_3,delta_7,delta_5,delta_I4), function (x) (x/Inzidenz) * 100)) %>%
   mutate(kw = isoweek(tag_nach_meldezeitraum)) %>%
+  filter(kw <= 18) %>%
   group_by(kw) %>%
   summarise(across(c(Inzidenz,delta_1,delta_2,delta_3,delta_7, delta_5,delta_I4), fun[1:5])) %>%
   ungroup()
